@@ -77,6 +77,7 @@
   eruda.init();
 </script>
 <script>
+  const BASE_URL = '{{ config("app.url") }}';
   (function() {
   // ---------- State ----------
   let unitsData = null; // Grup sistem berisi array unit
@@ -117,7 +118,7 @@
   // ---------- Load Units ----------
   async function loadUnits() {
   try {
-  const resp = await tgApp.fetchWithAuth('/api/units/all');
+  const resp = await tgApp.fetchWithAuth(BASE_URL + '/api/units/all');
   unitsData = resp.data;
   populateSelect(fromSelect, unitsData);
   populateSelect(toSelect, unitsData);
@@ -151,7 +152,7 @@
 
   tgApp.showLoading('Mengonversi...');
   try {
-  const resp = await tgApp.fetchWithAuth('/api/units/convert', {
+  const resp = await tgApp.fetchWithAuth(BASE_URL + '/api/units/convert', {
   method: 'POST',
   body: JSON.stringify({ value, from: fromId, to: toId })
   });
