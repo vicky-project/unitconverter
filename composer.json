@@ -17,7 +17,7 @@
     "php": "^8.2",
     "joshbrw/laravel-module-installer": "^1.0",
     "vicky-project/telegram-module": "^1.0",
-    "diversified-design/mesura-php": "*"
+    "diversified-design/mesura-php": "^0.3"
   },
   "autoload": {
     "psr-4": {
