@@ -245,4 +245,5 @@ return [
     ['class' => PhpUnitConversion\Unit\Volume\CubicInch::class, 'system' => 'Imperial'],
     ['class' => PhpUnitConversion\Unit\Volume\CubicYard::class, 'system' => 'Imperial'],
     ['class' => PhpUnitConversion\Unit\Volume\AcreFoot::class, 'system' => 'Imperial'],
-  ];
+  ]
+];
