@@ -1,0 +1,11 @@
+{
+    "name": "UnitConverter",
+    "alias": "unitconverter",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\UnitConverter\\Providers\\UnitConverterServiceProvider"
+    ],
+    "files": []
+}

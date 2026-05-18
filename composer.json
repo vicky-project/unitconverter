@@ -1,0 +1,34 @@
+{
+  "name": "vicky-project/unitconverter-module",
+  "type": "laravel-module",
+  "description": "Unit convertion module for telegram mini apps",
+  "license": "MIT",
+  "authors": [{
+    "name": "Vicky Rahman",
+    "email": "pratamavr@gmail.com"
+  }],
+  "extra": {
+    "laravel": {
+      "providers": [],
+      "aliases": {}
+    }
+  },
+  "require": {
+    "php": "^8.2",
+    "joshbrw/laravel-module-installer": "^1.0",
+    "vicky-project/telegram-module": "^1.0",
+    "diversified-design/mesura-php": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Modules\\UnitConverter\\": "app/",
+      "Modules\\UnitConverter\\Database\\Factories\\": "database/factories/",
+      "Modules\\UnitConverter\\Database\\Seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Modules\\UnitConverter\\Tests\\": "tests/"
+    }
+  }
+}
