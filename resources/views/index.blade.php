@@ -120,6 +120,7 @@
   try {
   const resp = await tgApp.fetchWithAuth(BASE_URL + '/api/units/all');
   unitsData = resp.data;
+  console.log(unitsData);
   populateSelect(fromSelect, unitsData);
   populateSelect(toSelect, unitsData);
   } catch (err) {
