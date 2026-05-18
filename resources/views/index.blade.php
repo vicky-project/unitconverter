@@ -1,4 +1,4 @@
-@extends('telegram:layouts.mini-app')
+@extends('telegram::layouts.mini-app')
 
 @section('title', 'Konversi Satuan')
 
