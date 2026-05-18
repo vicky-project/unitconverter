@@ -71,6 +71,196 @@
 </div>
 @endsection
 
+@push('scripts')
+<script src="//cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  eruda.init();
+</script>
+<script>
+  (function() {
+  // ---------- State ----------
+  let unitsData = null; // Grup sistem berisi array unit
+  let currentResult = null;
+
+  // ---------- DOM ----------
+  const fromSelect = document.getElementById('fromUnit');
+  const toSelect = document.getElementById('toUnit');
+  const valueInput = document.getElementById('valueInput');
+  const convertBtn = document.getElementById('convertBtn');
+  const swapBtn = document.getElementById('swapUnitsBtn');
+  const resultContainer = document.getElementById('resultContainer');
+  const resultValue = document.getElementById('resultValue');
+  const resultUnitSymbol = document.getElementById('resultUnitSymbol');
+  const resultFromInfo = document.getElementById('resultFromInfo');
+  const copyResultBtn = document.getElementById('copyResultBtn');
+  const errorContainer = document.getElementById('errorContainer');
+  const errorMessage = document.getElementById('errorMessage');
+  const historyList = document.getElementById('historyList');
+
+  // ---------- Helper: Render dropdown dengan optgroup ----------
+  function populateSelect(selectEl, data) {
+  selectEl.innerHTML = '';
+  if (!data) return;
+  for (const [system, units] of Object.entries(data)) {
+  const optgroup = document.createElement('optgroup');
+  optgroup.label = system;
+  for (const unit of units) {
+  const option = document.createElement('option');
+  option.value = unit.id;
+  option.textContent = `${unit.symbol} - ${unit.name}`;
+  optgroup.appendChild(option);
+  }
+  selectEl.appendChild(optgroup);
+  }
+  }
+
+  // ---------- Load Units ----------
+  async function loadUnits() {
+  try {
+  const resp = await tgApp.fetchWithAuth('/api/units/all');
+  unitsData = resp.data;
+  populateSelect(fromSelect, unitsData);
+  populateSelect(toSelect, unitsData);
+  } catch (err) {
+  tgApp.showToast('Gagal memuat daftar satuan', 'danger');
+  errorContainer.classList.remove('d-none');
+  errorMessage.textContent = 'Gagal memuat satuan. Silakan muat ulang.';
+  }
+  }
+
+  // ---------- Validasi sederhana apakah dua unit bisa dikonversi ----------
+  // Kita tidak bisa tahu domain tanpa API, tapi kita bisa tangani error dari server
+  // ---------- Konversi ----------
+  async function doConversion() {
+  const value = parseFloat(valueInput.value);
+  const fromId = fromSelect.value;
+  const toId = toSelect.value;
+
+  if (isNaN(value)) {
+  tgApp.showToast('Masukkan nilai numerik', 'warning');
+  return;
+  }
+  if (!fromId || !toId) {
+  tgApp.showToast('Pilih satuan sumber dan tujuan', 'warning');
+  return;
+  }
+
+  // Sembunyikan hasil sebelumnya
+  resultContainer.classList.add('d-none');
+  errorContainer.classList.add('d-none');
+
+  tgApp.showLoading('Mengonversi...');
+  try {
+  const resp = await tgApp.fetchWithAuth('/api/units/convert', {
+  method: 'POST',
+  body: JSON.stringify({ value, from: fromId, to: toId })
+  });
+  tgApp.hideLoading();
+  const data = resp.data;
+
+  // Tampilkan hasil
+  resultValue.textContent = data.result;
+  resultUnitSymbol.textContent = toSelect.options[toSelect.selectedIndex].text.split(' - ')[0] || '';
+  resultFromInfo.textContent = `${data.value} ${fromSelect.options[fromSelect.selectedIndex].text.split(' - ')[0]} =`;
+
+  resultContainer.classList.remove('d-none');
+  currentResult = data.result;
+
+  // Simpan ke riwayat (localStorage)
+  addToHistory(data);
+  // Scroll ke hasil
+  resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (err) {
+  tgApp.hideLoading();
+  errorContainer.classList.remove('d-none');
+  errorMessage.textContent = err.message || 'Konversi gagal';
+  tgApp.showToast(err.message || 'Konversi gagal', 'danger');
+  }
+  }
+
+  // ---------- Swap units ----------
+  function swapUnits() {
+  const fromVal = fromSelect.value;
+  const toVal = toSelect.value;
+  fromSelect.value = toVal;
+  toSelect.value = fromVal;
+  // Jika ada hasil, kosongkan
+  resultContainer.classList.add('d-none');
+  errorContainer.classList.add('d-none');
+  }
+
+  // ---------- Salin hasil ----------
+  function copyResult() {
+  if (currentResult) {
+  tgApp.copyToClipboard(currentResult);
+  }
+  }
+
+  // ---------- Riwayat di localStorage ----------
+  function addToHistory(convData) {
+  let history = JSON.parse(localStorage.getItem('unit_convert_history') || '[]');
+  // Batasi 10 entri
+  history.unshift(convData);
+  if (history.length > 10) history.pop();
+  localStorage.setItem('unit_convert_history', JSON.stringify(history));
+  renderHistory();
+  }
+
+  function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('unit_convert_history') || '[]');
+  historyList.innerHTML = '';
+  if (history.length === 0) {
+  historyList.innerHTML = '<div class="text-muted small">Belum ada riwayat</div>';
+  return;
+  }
+  history.forEach(item => {
+  const div = document.createElement('div');
+  div.className = 'list-group-item d-flex justify-content-between align-items-center px-0 py-1';
+  // Ambil simbol dari unit id dengan cara memotong
+  let fromSymbol = item.from.split('.').pop();
+  let toSymbol = item.to.split('.').pop();
+  // Jika dari dan to adalah class name, ambil potongan setelah titik terakhir
+  div.innerHTML = `
+  <span class="text-truncate me-2">${item.value} ${fromSymbol} → <strong>${item.result} ${toSymbol}</strong></span>
+  <button class="btn btn-link btn-sm p-0 text-decoration-none reuse-btn" data-from="${item.from}" data-to="${item.to}"><i class="bi bi-arrow-clockwise"></i></button>
+  `;
+  // Klik tombol reuse isi ulang dropdown dan nilai
+  div.querySelector('.reuse-btn').addEventListener('click', function(e) {
+  const fromId = this.dataset.from;
+  const toId = this.dataset.to;
+  fromSelect.value = fromId;
+  toSelect.value = toId;
+  valueInput.value = '';
+  resultContainer.classList.add('d-none');
+  errorContainer.classList.add('d-none');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  historyList.appendChild(div);
+  });
+  }
+
+  // ---------- Event Listeners ----------
+  convertBtn.addEventListener('click', doConversion);
+  swapBtn.addEventListener('click', swapUnits);
+  copyResultBtn.addEventListener('click', copyResult);
+
+  // Enter di input value juga submit
+  valueInput.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+  e.preventDefault();
+  doConversion();
+  }
+  });
+
+  // ---------- Inisialisasi ----------
+  loadUnits();
+  renderHistory();
+
+  // Agar dropdown searchable? Cukup pakai select standar, tapi bisa pakai tombol cari nanti jika perlu
+  })();
+</script>
+@endpush
+
 @push('styles')
 <style>
   /* Gunakan tema Telegram */
@@ -120,190 +310,4 @@
     border-color: var(--tg-theme-section-separator-color);
     }
     </style>
-    @endpush
-
-    @push('scripts')
-    <script>
-    (function() {
-    // ---------- State ----------
-    let unitsData = null; // Grup sistem berisi array unit
-    let currentResult = null;
-
-    // ---------- DOM ----------
-    const fromSelect = document.getElementById('fromUnit');
-    const toSelect = document.getElementById('toUnit');
-    const valueInput = document.getElementById('valueInput');
-    const convertBtn = document.getElementById('convertBtn');
-    const swapBtn = document.getElementById('swapUnitsBtn');
-    const resultContainer = document.getElementById('resultContainer');
-    const resultValue = document.getElementById('resultValue');
-    const resultUnitSymbol = document.getElementById('resultUnitSymbol');
-    const resultFromInfo = document.getElementById('resultFromInfo');
-    const copyResultBtn = document.getElementById('copyResultBtn');
-    const errorContainer = document.getElementById('errorContainer');
-    const errorMessage = document.getElementById('errorMessage');
-    const historyList = document.getElementById('historyList');
-
-    // ---------- Helper: Render dropdown dengan optgroup ----------
-    function populateSelect(selectEl, data) {
-    selectEl.innerHTML = '';
-    if (!data) return;
-    for (const [system, units] of Object.entries(data)) {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = system;
-    for (const unit of units) {
-    const option = document.createElement('option');
-    option.value = unit.id;
-    option.textContent = `${unit.symbol} - ${unit.name}`;
-    optgroup.appendChild(option);
-    }
-    selectEl.appendChild(optgroup);
-    }
-    }
-
-    // ---------- Load Units ----------
-    async function loadUnits() {
-    try {
-    const resp = await tgApp.fetchWithAuth('/api/units/all');
-    unitsData = resp.data;
-    populateSelect(fromSelect, unitsData);
-    populateSelect(toSelect, unitsData);
-    } catch (err) {
-    tgApp.showToast('Gagal memuat daftar satuan', 'danger');
-    errorContainer.classList.remove('d-none');
-    errorMessage.textContent = 'Gagal memuat satuan. Silakan muat ulang.';
-    }
-    }
-
-    // ---------- Validasi sederhana apakah dua unit bisa dikonversi ----------
-    // Kita tidak bisa tahu domain tanpa API, tapi kita bisa tangani error dari server
-    // ---------- Konversi ----------
-    async function doConversion() {
-    const value = parseFloat(valueInput.value);
-    const fromId = fromSelect.value;
-    const toId = toSelect.value;
-
-    if (isNaN(value)) {
-    tgApp.showToast('Masukkan nilai numerik', 'warning');
-    return;
-    }
-    if (!fromId || !toId) {
-    tgApp.showToast('Pilih satuan sumber dan tujuan', 'warning');
-    return;
-    }
-
-    // Sembunyikan hasil sebelumnya
-    resultContainer.classList.add('d-none');
-    errorContainer.classList.add('d-none');
-
-    tgApp.showLoading('Mengonversi...');
-    try {
-    const resp = await tgApp.fetchWithAuth('/api/units/convert', {
-    method: 'POST',
-    body: JSON.stringify({ value, from: fromId, to: toId })
-    });
-    tgApp.hideLoading();
-    const data = resp.data;
-
-    // Tampilkan hasil
-    resultValue.textContent = data.result;
-    resultUnitSymbol.textContent = toSelect.options[toSelect.selectedIndex].text.split(' - ')[0] || '';
-    resultFromInfo.textContent = `${data.value} ${fromSelect.options[fromSelect.selectedIndex].text.split(' - ')[0]} =`;
-
-    resultContainer.classList.remove('d-none');
-    currentResult = data.result;
-
-    // Simpan ke riwayat (localStorage)
-    addToHistory(data);
-    // Scroll ke hasil
-    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } catch (err) {
-    tgApp.hideLoading();
-    errorContainer.classList.remove('d-none');
-    errorMessage.textContent = err.message || 'Konversi gagal';
-    tgApp.showToast(err.message || 'Konversi gagal', 'danger');
-    }
-    }
-
-    // ---------- Swap units ----------
-    function swapUnits() {
-    const fromVal = fromSelect.value;
-    const toVal = toSelect.value;
-    fromSelect.value = toVal;
-    toSelect.value = fromVal;
-    // Jika ada hasil, kosongkan
-    resultContainer.classList.add('d-none');
-    errorContainer.classList.add('d-none');
-    }
-
-    // ---------- Salin hasil ----------
-    function copyResult() {
-    if (currentResult) {
-    tgApp.copyToClipboard(currentResult);
-    }
-    }
-
-    // ---------- Riwayat di localStorage ----------
-    function addToHistory(convData) {
-    let history = JSON.parse(localStorage.getItem('unit_convert_history') || '[]');
-    // Batasi 10 entri
-    history.unshift(convData);
-    if (history.length > 10) history.pop();
-    localStorage.setItem('unit_convert_history', JSON.stringify(history));
-    renderHistory();
-    }
-
-    function renderHistory() {
-    const history = JSON.parse(localStorage.getItem('unit_convert_history') || '[]');
-    historyList.innerHTML = '';
-    if (history.length === 0) {
-    historyList.innerHTML = '<div class="text-muted small">Belum ada riwayat</div>';
-    return;
-    }
-    history.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'list-group-item d-flex justify-content-between align-items-center px-0 py-1';
-    // Ambil simbol dari unit id dengan cara memotong
-    let fromSymbol = item.from.split('.').pop();
-    let toSymbol = item.to.split('.').pop();
-    // Jika dari dan to adalah class name, ambil potongan setelah titik terakhir
-    div.innerHTML = `
-    <span class="text-truncate me-2">${item.value} ${fromSymbol} → <strong>${item.result} ${toSymbol}</strong></span>
-    <button class="btn btn-link btn-sm p-0 text-decoration-none reuse-btn" data-from="${item.from}" data-to="${item.to}"><i class="bi bi-arrow-clockwise"></i></button>
-    `;
-    // Klik tombol reuse isi ulang dropdown dan nilai
-    div.querySelector('.reuse-btn').addEventListener('click', function(e) {
-    const fromId = this.dataset.from;
-    const toId = this.dataset.to;
-    fromSelect.value = fromId;
-    toSelect.value = toId;
-    valueInput.value = '';
-    resultContainer.classList.add('d-none');
-    errorContainer.classList.add('d-none');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    historyList.appendChild(div);
-    });
-    }
-
-    // ---------- Event Listeners ----------
-    convertBtn.addEventListener('click', doConversion);
-    swapBtn.addEventListener('click', swapUnits);
-    copyResultBtn.addEventListener('click', copyResult);
-
-    // Enter di input value juga submit
-    valueInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-    e.preventDefault();
-    doConversion();
-    }
-    });
-
-    // ---------- Inisialisasi ----------
-    loadUnits();
-    renderHistory();
-
-    // Agar dropdown searchable? Cukup pakai select standar, tapi bisa pakai tombol cari nanti jika perlu
-    })();
-    </script>
     @endpush
