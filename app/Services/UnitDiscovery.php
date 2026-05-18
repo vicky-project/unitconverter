@@ -53,7 +53,14 @@ class UnitDiscovery
     $unit2 = $this->find($id2);
     if (!$unit1 || !$unit2) return false;
 
-    return $unit1['class']::getBaseUnit() === $unit2['class']::getBaseUnit();
+    return $this->getDomain($unit1['class']) === $this->getDomain($unit2['class']);
+  }
+
+  protected function getDomain(string $class): string
+  {
+    // PhpUnitConversion\Unit\Area\Acre → Area
+    $parts = explode('\\', $class);
+    return $parts[3] ?? '';
   }
 
   protected function makeId(string $class): string
