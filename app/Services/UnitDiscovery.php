@@ -7,7 +7,7 @@ class UnitDiscovery
   protected array $units;
 
   public function __construct() {
-    $this->units = config('unit-converter.units', []);
+    $this->units = config('unitconverter.units', []);
   }
 
   /**
