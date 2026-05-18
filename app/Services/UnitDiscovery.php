@@ -7,9 +7,12 @@ class UnitDiscovery
   protected array $units;
 
   public function __construct() {
-    $this->units = config('unitconverter.units', []);
+    $this->units = config('unit-converter.units', []);
   }
 
+  /**
+  * Get all units grouped by system.
+  */
   public function getGroupedBySystem(): array
   {
     $grouped = [];
@@ -19,7 +22,7 @@ class UnitDiscovery
 
       $grouped[$system][] = [
         'id' => $this->makeId($class),
-        'name' => $class::NAME,
+        'name' => $class::LABEL,
         'symbol' => $class::SYMBOL,
         'system' => $system,
         'class' => $class,
@@ -35,7 +38,7 @@ class UnitDiscovery
       if ($this->makeId($unit['class']) === $id) {
         return [
           'id' => $id,
-          'name' => $unit['class']::NAME,
+          'name' => $unit['class']::LABEL,
           'symbol' => $unit['class']::SYMBOL,
           'class' => $unit['class'],
         ];
@@ -50,7 +53,6 @@ class UnitDiscovery
     $unit2 = $this->find($id2);
     if (!$unit1 || !$unit2) return false;
 
-    // Bandingkan base unit class (misal: PhpUnitConversion\Unit\Length\Meter, ...)
     return $unit1['class']::getBaseUnit() === $unit2['class']::getBaseUnit();
   }
 
