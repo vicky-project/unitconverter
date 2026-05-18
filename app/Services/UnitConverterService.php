@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\UnitConverter\Services;
 
 class UnitConverterService
@@ -19,14 +20,16 @@ class UnitConverterService
 
     $fromClass = $fromUnit['class'];
     $toClass = $toUnit['class'];
+
     $measurement = new $fromClass($value);
-    $result = $measurement->toUnit($toClass);
+    $result = $measurement->to($toClass); // float
 
     return [
       'value' => $value,
       'from' => $fromId,
       'to' => $toId,
-      'result' => $result->value(),
+      'result' => $result,
+      // float, tetapi bisa kita format presisi jika perlu
     ];
   }
 }
