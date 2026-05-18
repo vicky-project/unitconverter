@@ -3,6 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Modules\UnitConverter\Http\Controllers\UnitConverterController;
 
-Route::prefix('apps')->group(function () {
-  Route::get('unit-converter', [UnitConverterController::class, 'index']);
+Route::prefix('apps')->name('apps.')->group(function () {
+  Route::get('unit-converter', [UnitConverterController::class, 'index'])->name('unit-converter');
 });
