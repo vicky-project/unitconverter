@@ -22,8 +22,8 @@ class UnitDiscovery
 
       $grouped[$system][] = [
         'id' => $this->makeId($class),
-        'name' => $class::LABEL,
-        'symbol' => $class::SYMBOL,
+        'name' => $class->getLabel(),
+        'symbol' => $class->getSymbol(),
         'system' => $system,
         'class' => $class,
       ];
@@ -61,8 +61,8 @@ class UnitDiscovery
       if ($this->getDomain($unit['class']) === $domain) {
         $result[] = [
           'id' => $this->makeId($unit['class']),
-          'name' => $unit['class']::LABEL,
-          'symbol' => $unit['class']::SYMBOL,
+          'name' => $unit['class']->getLabel(),
+          'symbol' => $unit['class']->getSymbol(),
           'system' => $unit['system'],
         ];
       }
@@ -76,8 +76,8 @@ class UnitDiscovery
       if ($this->makeId($unit['class']) === $id) {
         return [
           'id' => $id,
-          'name' => $unit['class']::LABEL,
-          'symbol' => $unit['class']::SYMBOL,
+          'name' => $unit['class']->getLabel(),
+          'symbol' => $unit['class']->getSymbol(),
           'class' => $unit['class'],
         ];
       }

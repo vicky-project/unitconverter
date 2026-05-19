@@ -28,8 +28,8 @@ class UnitConverterService
       'value' => $value,
       'from' => $fromId,
       'to' => $toId,
-      'result' => $result,
-      // float, tetapi bisa kita format presisi jika perlu
+      'result' => $result->getValue(),
+      'formatted' => $result->format(6)
     ];
   }
 }
