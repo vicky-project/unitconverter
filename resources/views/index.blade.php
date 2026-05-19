@@ -80,7 +80,7 @@
   <!-- Riwayat Konversi (opsional) -->
   <div class="mt-4" id="historyContainer">
     <h6 class="text-muted mb-2"><i class="bi bi-clock-history me-1"></i>Riwayat</h6>
-    <div id="historyList" class="list-group list-group-flush small p-2"></div>
+    <div id="historyList" class="list-group list-group-flush small m-2"></div>
   </div>
 </div>
 @endsection
