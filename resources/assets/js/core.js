@@ -7,8 +7,8 @@
   // Fetch dengan token Sanctum (mengandalkan tgApp.fetchWithAuth dari layout)
   ns.fetchWithAuth = async function(url, options = {}) {
     // Manfaatkan global TelegramApp.fetchWithAuth
-    if (window.tgApp && typeof window.tgApp.fetchWithAuth === 'function') {
-      return window.tgApp.fetchWithAuth(url, options);
+    if (tgApp && typeof tgApp.fetchWithAuth === 'function') {
+      return tgApp.fetchWithAuth(url, options);
     }
     // Fallback manual jika tgApp tidak tersedia (untuk pengembangan lokal)
     const token = localStorage.getItem('telegram_token');

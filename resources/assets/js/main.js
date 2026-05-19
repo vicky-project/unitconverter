@@ -57,7 +57,7 @@
           domainSelect.dispatchEvent(new Event('change'));
         }
       } catch (err) {
-        window.tgApp?.showToast('Gagal memuat domain', 'danger');
+        tgApp.showToast('Gagal memuat domain', 'danger');
       }
     }
 
@@ -81,7 +81,7 @@
         });
         targetSelect.disabled = false;
       } catch (err) {
-        window.tgApp?.showToast('Gagal memuat satuan', 'danger');
+        tgApp.showToast('Gagal memuat satuan', 'danger');
       }
     }
 
@@ -109,17 +109,17 @@
       const toId = toSelect.value;
 
       if (isNaN(value)) {
-        window.tgApp?.showToast('Masukkan nilai numerik', 'warning');
+        tgApp.showToast('Masukkan nilai numerik', 'warning');
         return;
       }
       if (!fromId || !toId) {
-        window.tgApp?.showToast('Pilih satuan sumber dan tujuan', 'warning');
+        tgApp.showToast('Pilih satuan sumber dan tujuan', 'warning');
         return;
       }
 
       hideError();
       resultContainer.classList.add('d-none');
-      window.tgApp?.showLoading?.('Mengonversi...');
+      tgApp.showLoading?.('Mengonversi...');
 
       try {
         const resp = await ns.fetchWithAuth(ns.BASE_URL + '/api/units/convert', {
@@ -128,7 +128,7 @@
             value, from: fromId, to: toId
           })
         });
-        window.tgApp?.hideLoading?.();
+        tgApp.hideLoading?.();
         showResult(resp.data);
         // Simpan riwayat
         ns.addToHistory(resp.data);
@@ -137,9 +137,9 @@
           behavior: 'smooth', block: 'nearest'
         });
       } catch (err) {
-        window.tgApp?.hideLoading?.();
+        tgApp.hideLoading?.();
         showError(err.message || 'Konversi gagal');
-        window.tgApp?.showToast(err.message || 'Konversi gagal', 'danger');
+        tgApp.showToast(err.message || 'Konversi gagal', 'danger');
       }
     }
 
@@ -166,7 +166,7 @@
     copyResultBtn.addEventListener('click',
       function() {
         if (ns.currentResult) {
-          window.tgApp?.copyToClipboard(ns.currentResult);
+          tgApp.copyToClipboard(ns.currentResult);
         }
       });
 
@@ -193,7 +193,7 @@
         }, 200);
       } else {
         // fallback: tidak bisa reuse
-        window.tgApp?.showToast('Domain tidak ditemukan', 'warning');
+        tgApp.showToast('Domain tidak ditemukan', 'warning');
       }
     };
 
