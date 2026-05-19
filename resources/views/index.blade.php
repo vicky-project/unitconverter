@@ -54,12 +54,12 @@
           <div class="text-muted small">
             Hasil Konversi
           </div>
+          <div class="text-muted small mt-1">
+            <span id="resultFromInfo"></span>
+          </div>
           <div class="d-flex align-items-baseline flex-wrap">
             <span id="resultValue" class="fs-3 fw-bold text-success me-2"></span>
             <span id="resultUnitSymbol" class="text-secondary fs-6"></span>
-          </div>
-          <div class="text-muted small mt-1">
-            <span id="resultFromInfo"></span>
           </div>
         </div>
         <button class="btn btn-outline-secondary btn-sm" id="copyResultBtn" title="Salin hasil">
