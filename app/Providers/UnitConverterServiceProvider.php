@@ -39,6 +39,14 @@ class UnitConverterServiceProvider extends ServiceProvider
       __DIR__ . '/../app/Custom/Energy',
       'Modules\\UnitConverter\\Custom\\Energy'
     );
+    UnitMap::add(
+      __DIR__ . '/../app/Custom/Frequency',
+      'Modules\\UnitConverter\\Custom\\Frequency'
+    );
+    UnitMap::add(
+      __DIR__ . '/../app/Custom/DigitalStorage',
+      'Modules\\UnitConverter\\Custom\\DigitalStorage'
+    );
   }
 
   /**
