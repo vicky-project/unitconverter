@@ -4,9 +4,9 @@ namespace Modules\UnitConverter\Custom\Pressure;
 
 use PhpUnitConversion\System\Metric;
 use PhpUnitConversion\Traits\BaseUnit;
-use Modules\UnitConverter\Custom\Pressure;
+use Modules\UnitConverter\Custom\Pressure as BasePressure;
 
-class Pascal extends Pressure implements Metric
+class Pascal extends BasePressure implements Metric
 {
   use BaseUnit;
 
