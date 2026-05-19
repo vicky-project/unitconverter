@@ -100,7 +100,7 @@ class UnitDiscovery
   {
     // PhpUnitConversion\Unit\Area\Acre → Area
     $parts = explode('\\', $class);
-    return $parts[3] ?? '';
+    return $parts[2] ?? '';
   }
 
   protected function makeId(string $class): string
