@@ -15,6 +15,9 @@
     const copyResultBtn = document.getElementById('copyResultBtn');
     const errorContainer = document.getElementById('errorContainer');
     const errorMessage = document.getElementById('errorMessage');
+    const conversionTableContainer = document.getElementById('conversionTableContainer');
+    const domainNameSpan = document.getElementById('domainName');
+    const conversionTableBody = document.getElementById('conversionTableBody');
 
     // ----- Fungsi helper untuk UI -----
     function showError(msg) {
@@ -50,7 +53,7 @@
           option.textContent = d.name;
           domainSelect.appendChild(option);
         });
-        // Jika ada nilai sebelumnya di localStorage? (opsional)
+        // Preferensi domain terakhir
         const lastDomain = localStorage.getItem('unit_last_domain');
         if (lastDomain && ns.domains.some(d => d.key === lastDomain)) {
           domainSelect.value = lastDomain;
@@ -61,7 +64,7 @@
       }
     }
 
-    // Muat satuan ke dropdown target
+    // Muat satuan ke dropdown target, lalu simpan di ns.unitsByDomain
     async function loadUnitsForDomain(domain, targetSelect) {
       targetSelect.innerHTML = '<option value="">Memuat...</option>';
       targetSelect.disabled = true;
@@ -80,6 +83,15 @@
           targetSelect.appendChild(option);
         });
         targetSelect.disabled = false;
+
+        // Simpan cache unit untuk domain (hanya jika belum ada atau paksa refresh)
+        if (!ns.unitsByDomain[domain]) {
+          ns.unitsByDomain[domain] = units.map(u => ({
+            id: u.id,
+            name: u.name,
+            symbol: u.symbol
+          }));
+        }
       } catch (err) {
         tgApp.showToast('Gagal memuat satuan', 'danger');
       }
@@ -88,13 +100,14 @@
     // Saat domain berubah
     domainSelect.addEventListener('change', function() {
       const domain = this.value;
-      localStorage.setItem('unit_last_domain', domain); // simpan preferensi
+      localStorage.setItem('unit_last_domain', domain);
       fromSelect.innerHTML = '<option value="">Pilih satuan</option>';
       toSelect.innerHTML = '<option value="">Pilih satuan</option>';
       fromSelect.disabled = !domain;
       toSelect.disabled = !domain;
       hideError();
       resultContainer.classList.add('d-none');
+      if (conversionTableContainer) conversionTableContainer.style.display = 'none';
 
       if (domain) {
         loadUnitsForDomain(domain, fromSelect);
@@ -102,7 +115,7 @@
       }
     });
 
-    // Konversi
+    // Tombol Konversi (satu-ke-satu)
     async function doConversion() {
       const value = parseFloat(valueInput.value);
       const fromId = fromSelect.value;
@@ -130,9 +143,6 @@
         });
         tgApp.hideLoading?.();
         showResult(resp.data);
-        // Simpan riwayat
-        ns.addToHistory(resp.data);
-        // Scroll ke hasil
         resultContainer.scrollIntoView({
           behavior: 'smooth', block: 'nearest'
         });
@@ -143,6 +153,84 @@
       }
     }
 
+    // Tabel konversi otomatis (debounce)
+    let debounceTimer = null;
+
+    async function updateConversionTable() {
+      const domain = domainSelect.value;
+      const fromId = fromSelect.value;
+      const value = parseFloat(valueInput.value);
+
+      if (!domain || !fromId || isNaN(value)) {
+        if (conversionTableContainer) conversionTableContainer.style.display = 'none';
+        return;
+      }
+
+      const units = ns.unitsByDomain[domain];
+      if (!units || units.length <= 1) {
+        if (conversionTableContainer) conversionTableContainer.style.display = 'none';
+        return;
+      }
+
+      // Tampilkan loading di tabel
+      if (domainNameSpan) domainNameSpan.textContent = domain;
+      if (conversionTableBody) {
+        conversionTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Memuat...</td></tr>';
+      }
+      if (conversionTableContainer) conversionTableContainer.style.display = 'block';
+
+      // Filter unit selain sumber
+      const targetUnits = units.filter(u => u.id !== fromId);
+      const promises = targetUnits.map(async (unit) => {
+        try {
+          const resp = await ns.fetchWithAuth(ns.BASE_URL + '/api/units/convert', {
+            method: 'POST',
+            body: JSON.stringify({
+              value, from: fromId, to: unit.id
+            })
+          });
+          return {
+            name: unit.name, symbol: unit.symbol, result: resp.data.result
+          };
+        } catch (err) {
+          return {
+            name: unit.name, symbol: unit.symbol, result: 'Error'
+          };
+        }
+      });
+
+      const results = await Promise.all(promises);
+      if (conversionTableBody) {
+        conversionTableBody.innerHTML = '';
+        results.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+          <td>${row.name}</td>
+          <td>${row.symbol}</td>
+          <td class="text-end fw-bold">${row.result}</td>
+          `;
+          conversionTableBody.appendChild(tr);
+        });
+      }
+    }
+
+    // Event: fromSelect berubah -> update tabel (debounce)
+    fromSelect.addEventListener('change', function() {
+      hideError();
+      resultContainer.classList.add('d-none');
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(updateConversionTable, 300);
+    });
+
+    // Event: nilai input berubah -> debounce update tabel
+    valueInput.addEventListener('input', function() {
+      hideError();
+      resultContainer.classList.add('d-none');
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(updateConversionTable, 300);
+    });
+
+    // Tombol Konversi
     convertBtn.addEventListener('click', doConversion);
     valueInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
@@ -160,6 +248,9 @@
         toSelect.value = fromVal;
         hideError();
         resultContainer.classList.add('d-none');
+        // Setelah swap, update tabel jika data lengkap
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateConversionTable, 300);
       });
 
     // Salin hasil
@@ -169,38 +260,6 @@
           tgApp.copyToClipboard(ns.currentResult);
         }
       });
-
-    // Fungsi reuse dari riwayat (dipanggil dari core)
-    ns._reuseConversionUI = function(fromId,
-      toId) {
-      // Cari domain dari fromId
-      const parts = fromId.split('.');
-      let domain = parts[2] || '';
-      if (domain === 'Custom') {
-        domain = parts[3] || '';
-      }
-      if (domain && ns.domains.some(d => d.key === domain)) {
-        domainSelect.value = domain;
-        domainSelect.dispatchEvent(new Event('change'));
-        // Tunggu sebentar sampai dropdown terisi lalu set nilai
-        setTimeout(() => {
-          fromSelect.value = fromId;
-          toSelect.value = toId;
-          valueInput.value = '';
-          hideError();
-          resultContainer.classList.add('d-none');
-          window.scrollTo({
-            top: 0, behavior: 'smooth'
-          });
-        }, 200);
-      } else {
-        // fallback: tidak bisa reuse
-        tgApp.showToast('Domain tidak ditemukan', 'warning');
-      }
-    };
-
-    // Render riwayat saat inisialisasi
-    ns.renderHistory();
 
     // Muat domain pertama kali
     loadDomains();

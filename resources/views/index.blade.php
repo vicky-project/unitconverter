@@ -77,10 +77,23 @@
     </div>
   </div>
 
-  <!-- Riwayat Konversi (opsional) -->
-  <div class="mt-4" id="historyContainer">
-    <h6 class="text-muted mb-2"><i class="bi bi-clock-history me-1"></i>Riwayat</h6>
-    <div id="historyList" class="list-group list-group-flush small m-2"></div>
+  {{-- TAMBAHKAN setelah errorContainer --}}
+  <div class="mt-4" id="conversionTableContainer" style="display:none;">
+    <h6 class="text-muted mb-2">
+      <i class="bi bi-table me-1"></i>Konversi ke Semua Satuan dalam Domain <span id="domainName"></span>
+    </h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead>
+          <tr>
+            <th>Satuan</th>
+            <th>Simbol</th>
+            <th>Hasil</th>
+          </tr>
+        </thead>
+        <tbody id="conversionTableBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 @endsection
@@ -147,6 +160,15 @@
     #historyList .list-group-item {
     background-color: transparent;
     border-color: var(--tg-theme-section-separator-color);
+    }
+    #conversionTableBody td {
+    vertical-align: middle;
+    }
+    .table-bordered th, .table-bordered td {
+    border-color: var(--tg-theme-section-separator-color);
+    }
+    #conversionTableContainer {
+    margin-bottom: 2rem;
     }
     </style>
     @endpush
