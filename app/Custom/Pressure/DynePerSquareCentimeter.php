@@ -2,9 +2,9 @@
 
 namespace Modules\UnitConverter\Custom\Pressure;
 
-use PhpUnitConversion\System\CGS;
+use PhpUnitConversion\System\Metric;
 
-class DynePerSquareCentimeter extends Pascal implements CGS
+class DynePerSquareCentimeter extends Pascal implements Metric
 {
   const FACTOR = 0.1;
   const SYMBOL = 'dyn/cm²';

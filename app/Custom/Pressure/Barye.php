@@ -2,9 +2,9 @@
 
 namespace Modules\UnitConverter\Custom\Pressure;
 
-use PhpUnitConversion\System\CGS;
+use PhpUnitConversion\System\Metric;
 
-class Barye extends Pascal implements CGS
+class Barye extends Pascal implements Metric
 {
   const FACTOR = 0.1;
   const SYMBOL = 'Ba';
