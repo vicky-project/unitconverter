@@ -76,8 +76,8 @@ class UnitDiscovery
       if ($this->makeId($unit['class']) === $id) {
         return [
           'id' => $id,
-          'name' => $unit['class']->getLabel(),
-          'symbol' => $unit['class']->getSymbol(),
+          'name' => (new $unit['class']())->getLabel(),
+          'symbol' => (new $unit['class']())->getSymbol(),
           'class' => $unit['class'],
         ];
       }
