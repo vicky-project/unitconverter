@@ -245,5 +245,15 @@ return [
     ['class' => PhpUnitConversion\Unit\Volume\CubicInch::class, 'system' => 'Imperial'],
     ['class' => PhpUnitConversion\Unit\Volume\CubicYard::class, 'system' => 'Imperial'],
     ['class' => PhpUnitConversion\Unit\Volume\AcreFoot::class, 'system' => 'Imperial'],
+
+    // ==================== Pressure ====================
+    ['class' => Modules\UnitConverter\Custom\Pressure\Pascal::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\KiloPascal::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\Bar::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\Millibar::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\PSI::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\Atmosphere::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\Torr::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\MillimeterOfMercury::class, 'system' => 'Metric'],
   ]
 ];
