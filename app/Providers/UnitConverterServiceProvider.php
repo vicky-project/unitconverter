@@ -32,7 +32,7 @@ class UnitConverterServiceProvider extends ServiceProvider
     $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
 
     UnitMap::add(
-      __DIR__ . '/../Custom/Pressure',
+      __DIR__ . '/../app/Custom/Pressure',
       'Modules\\UnitConverter\\Custom\\Pressure'
     );
   }
