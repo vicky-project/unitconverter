@@ -279,5 +279,17 @@ return [
     ['class' => Modules\UnitConverter\Custom\Pressure\Atmosphere::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\Torr::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\MillimeterOfMercury::class, 'system' => 'Metric'],
+
+    // ==================== Energy ====================
+    ['class' => Modules\UnitConverter\Custom\Energy\Joule::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Energy\KiloJoule::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Energy\MegaJoule::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Energy\GigaJoule::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Calorie::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\KiloCalorie::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\BritishThermalUnit::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Energy\KiloWattHour::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\WattHour::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\FootPound::class, 'system' => 'Imperial'],
   ]
 ];
