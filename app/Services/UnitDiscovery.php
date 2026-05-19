@@ -100,6 +100,9 @@ class UnitDiscovery
   {
     // PhpUnitConversion\Unit\Area\Acre → Area
     $parts = explode('\\', $class);
+    if (isset($parts[2]) && $parts[2] === 'Custom') {
+      return $parts[3] ?? '';
+    }
     return $parts[2] ?? '';
   }
 

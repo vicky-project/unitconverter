@@ -175,8 +175,10 @@
       toId) {
       // Cari domain dari fromId
       const parts = fromId.split('.');
-      // PhpUnitConversion.Unit.Area.Acre -> Area
-      const domain = parts[2] || '';
+      let domain = parts[2] || '';
+      if (domain === 'Custom') {
+        domain = parts[3] || '';
+      }
       if (domain && ns.domains.some(d => d.key === domain)) {
         domainSelect.value = domain;
         domainSelect.dispatchEvent(new Event('change'));
