@@ -54,17 +54,22 @@
           <div class="text-muted small">
             Hasil Konversi
           </div>
-          <div class="text-muted small mt-1">
-            <span id="resultFromInfo"></span>
-          </div>
           <div class="d-flex align-items-baseline flex-wrap">
             <span id="resultValue" class="fs-3 fw-bold text-success me-2"></span>
             <span id="resultUnitSymbol" class="text-secondary fs-6"></span>
           </div>
+          <div class="text-muted small mt-1">
+            <span id="resultFromInfo"></span>
+          </div>
         </div>
-        <button class="btn btn-outline-secondary btn-sm" id="copyResultBtn" title="Salin hasil">
-          <i class="bi bi-clipboard"></i>
-        </button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
+            <i class="bi bi-arrow-left-right"></i>
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" id="copyResultBtn" title="Salin hasil">
+            <i class="bi bi-clipboard"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -77,24 +82,6 @@
     </div>
   </div>
 
-  {{-- TAMBAHKAN setelah errorContainer --}}
-  <div class="mt-4" id="conversionTableContainer" style="display:none;">
-    <h6 class="text-muted mb-2">
-      <i class="bi bi-table me-1"></i>Konversi ke Semua Satuan dalam Domain <span id="domainName"></span>
-    </h6>
-    <div class="table-responsive">
-      <table class="table table-sm table-bordered">
-        <thead>
-          <tr>
-            <th>Satuan</th>
-            <th>Simbol</th>
-            <th>Hasil</th>
-          </tr>
-        </thead>
-        <tbody id="conversionTableBody"></tbody>
-      </table>
-    </div>
-  </div>
 </div>
 @endsection
 
@@ -115,7 +102,6 @@
 
 @push('styles')
 <style>
-  /* Gunakan tema Telegram */
   body {
     background-color: var(--tg-theme-bg-color, #fff);
     color: var(--tg-theme-text-color, #000);
@@ -152,23 +138,6 @@
     background-color: rgba(220,53,69,0.1);
     border-color: rgba(220,53,69,0.3);
     color: var(--tg-theme-text-color);
-    }
-    select optgroup {
-    font-weight: bold;
-    color: var(--tg-theme-hint-color);
-    }
-    #historyList .list-group-item {
-    background-color: transparent;
-    border-color: var(--tg-theme-section-separator-color);
-    }
-    #conversionTableBody td {
-    vertical-align: middle;
-    }
-    .table-bordered th, .table-bordered td {
-    border-color: var(--tg-theme-section-separator-color);
-    }
-    #conversionTableContainer {
-    margin-bottom: 2rem;
     }
     </style>
     @endpush
