@@ -10,7 +10,6 @@ class Pascal extends Pressure implements Metric
 {
   use BaseUnit;
 
-  const FACTOR = 1.0;
   const SYMBOL = 'Pa';
   const LABEL = 'pascal';
 }
