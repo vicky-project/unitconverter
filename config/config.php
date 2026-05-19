@@ -279,6 +279,7 @@ return [
     ['class' => Modules\UnitConverter\Custom\Pressure\Atmosphere::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\Torr::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\MillimeterOfMercury::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\KgPerSquareCentimeter::class, 'system' => 'Metric'],
 
     // ==================== Energy ====================
     ['class' => Modules\UnitConverter\Custom\Energy\Joule::class, 'system' => 'SI'],
@@ -291,5 +292,16 @@ return [
     ['class' => Modules\UnitConverter\Custom\Energy\KiloWattHour::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Energy\WattHour::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Energy\FootPound::class, 'system' => 'Imperial'],
+    // Tambahan satuan energi
+    ['class' => Modules\UnitConverter\Custom\Energy\InchPound::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Energy\HorsepowerHour::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Therm::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Quad::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Energy\BarrelOfOilEquivalent::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\TonneOfOilEquivalent::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\TonneOfCoalEquivalent::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Hartree::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Rydberg::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\LiterAtmosphere::class, 'system' => 'Metric'],
   ]
 ];
