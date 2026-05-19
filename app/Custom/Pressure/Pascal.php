@@ -2,11 +2,11 @@
 
 namespace Modules\UnitConverter\Custom\Pressure;
 
-use PhpUnitConversion\Unit;
 use PhpUnitConversion\System\Metric;
 use PhpUnitConversion\Traits\BaseUnit;
+use Modules\UnitConverter\Custom\Pressure;
 
-class Pascal extends Unit implements Metric
+class Pascal extends Pressure implements Metric
 {
   use BaseUnit;
 
