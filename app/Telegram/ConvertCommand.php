@@ -84,9 +84,6 @@ class ConvertCommand extends BaseCommandHandler
 
   private function prepareDomainKeyboard(array $domains): array
   {
-    $this->inlineKeyboard->setModule('unitconverter');
-    $this->inlineKeyboard->setEntity('domain');
-
     $items = array_map(function ($domain) {
       return [
         'text' => $domain['name'],
@@ -96,6 +93,10 @@ class ConvertCommand extends BaseCommandHandler
         ],
       ];
     }, $domains);
+
+    // Builder akan menggunakan setModule('unitconverter') dan setEntity('domain')
+    $this->inlineKeyboard->setModule('unitconverter');
+    $this->inlineKeyboard->setEntity('domain');
 
     return $this->inlineKeyboard->grid($items, 3);
   }

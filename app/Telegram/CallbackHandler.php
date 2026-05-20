@@ -95,12 +95,24 @@ class CallbackHandler extends BaseCallbackHandler
       Cache::forget("unitconv_state_{$chatId}");
     }
 
-    // ----- Helper untuk daftar domain -----
+    // ----- Helper: tombol kembali -----
+    private function backButton(string $entity): array
+    {
+      // Penting: value diisi string kosong, bukan null
+      return [
+        [
+          'text' => '« Kembali',
+          'callback_data' => [
+            'action' => 'back',
+          ],
+        ],
+      ];
+    }
+
+    // ----- Helper: daftar domain (untuk navigasi kembali) -----
     private function domainListEdit(): array
     {
       $domains = $this->unitDiscovery->getDomains();
-      $this->inlineKeyboard->setModule('unitconverter');
-      $this->inlineKeyboard->setEntity('domain');
 
       $items = array_map(function ($domain) {
         return [
@@ -112,12 +124,14 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }, $domains);
 
+      $this->inlineKeyboard->setModule('unitconverter');
+      $this->inlineKeyboard->setEntity('domain');
+      $keyboards = $this->inlineKeyboard->grid($items, 3);
+
       return [
         'text' => "*🔀 Konversi Satuan*\n\nSilakan pilih _domain_ satuan:",
         'parse_mode' => 'MarkdownV2',
-        'reply_markup' => [
-          'inline_keyboard' => $this->inlineKeyboard->grid($items, 3),
-        ],
+        'reply_markup' => ['inline_keyboard' => $keyboards],
       ];
     }
 
@@ -169,6 +183,7 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
+      $keyboards[] = $this->backButton('domain');
 
       $message = "*Pilih Satuan Sumber*\n";
       $message .= "Domain: *{$id}*\n";
@@ -193,39 +208,11 @@ class CallbackHandler extends BaseCallbackHandler
       $domain = $state['domain'] ?? null;
 
       if ($action === 'back') {
-        if (!$domain) {
-          return [
-            'success' => true,
-            'status' => 'back_to_domains',
-            'edit_message' => $this->domainListEdit(),
-          ];
-        }
-
-        // Kembali ke pilih from
-        $units = $this->unitDiscovery->getUnitsByDomainWithShortIds($domain);
-        $this->inlineKeyboard->setModule('unitconverter');
-        $this->inlineKeyboard->setEntity('from');
-
-        $items = array_map(function ($unit) {
-          return [
-            'text' => $unit['symbol'] . ' - ' . $unit['name'],
-            'callback_data' => [
-              'action' => 'select',
-              'value' => $unit['short_id'],
-            ],
-          ];
-        }, $units);
-
-        $keyboards = $this->inlineKeyboard->grid($items, 2);
-
+        $this->clearState($chatId);
         return [
           'success' => true,
-          'status' => 'back_to_from',
-          'edit_message' => [
-            'text' => "*Pilih Satuan Sumber*\nDomain: *{$domain}*",
-            'parse_mode' => 'MarkdownV2',
-            'reply_markup' => ['inline_keyboard' => $keyboards],
-          ],
+          'status' => 'back_to_domains',
+          'edit_message' => $this->domainListEdit(),
         ];
       }
 
@@ -242,7 +229,6 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }
 
-      // Resolve short ID ke real ID
       $realId = $this->unitDiscovery->resolveShortId($domain, $id);
       if (!$realId) {
         return [
@@ -255,7 +241,6 @@ class CallbackHandler extends BaseCallbackHandler
       $state['fromId'] = $realId;
       $this->setState($chatId, $state);
 
-      // Tampilkan satuan "to"
       $units = $this->unitDiscovery->getUnitsByDomainWithShortIds($domain);
 
       $this->inlineKeyboard->setModule('unitconverter');
@@ -272,6 +257,7 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
+      $keyboards[] = $this->backButton('from');
 
       $fromUnit = $this->unitDiscovery->find($realId);
       $fromLabel = $fromUnit ? $fromUnit['symbol'] . ' (' . $fromUnit['name'] . ')' : $realId;
@@ -301,10 +287,11 @@ class CallbackHandler extends BaseCallbackHandler
       $fromId = $state['fromId'] ?? null;
 
       if ($action === 'back') {
-        if (!$domain || !$fromId) {
+        if (!$domain) {
+          $this->clearState($chatId);
           return [
             'success' => true,
-            'status' => 'back_to_from',
+            'status' => 'back_to_domains',
             'edit_message' => $this->domainListEdit(),
           ];
         }
@@ -325,6 +312,7 @@ class CallbackHandler extends BaseCallbackHandler
         }, $units);
 
         $keyboards = $this->inlineKeyboard->grid($items, 2);
+        $keyboards[] = $this->backButton('domain');
 
         return [
           'success' => true,
@@ -350,7 +338,6 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }
 
-      // Resolve short ID ke real ID
       $realId = $this->unitDiscovery->resolveShortId($domain, $id);
       if (!$realId) {
         return [
