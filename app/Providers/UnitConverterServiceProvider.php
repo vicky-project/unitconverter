@@ -12,6 +12,7 @@ use Modules\UnitConverter\Services\UnitDiscovery;
 use Modules\UnitConverter\Services\UnitConverterService;
 use Modules\UnitConverter\Telegram\ConvertCommand;
 use Modules\UnitConverter\Telegram\CallbackHandler;
+use Modules\UnitConverter\Telegram\Replies\InputNumberReplyHandler;
 use PhpUnitConversion\Map as UnitMap;
 
 class UnitConverterServiceProvider extends ServiceProvider
@@ -64,6 +65,11 @@ class UnitConverterServiceProvider extends ServiceProvider
       $callback = $this->app->make(Services\Handlers\CallbackHandler::class);
       $this->registerCallbackHandlers($callback);
     }
+
+    if ($this->app->bound(Services\Handlers\ReplyDispatcher::class)) {
+      $dispatcher = $this->app->make(Services\Handlers\ReplyDispatcher::class);
+      $this->registerReplyHandlers($dispatcher);
+    }
   }
 
   /**
@@ -97,6 +103,17 @@ class UnitConverterServiceProvider extends ServiceProvider
         $this->app->make(UnitDiscovery::class),
         $this->app->make(UnitConverterService::class),
         $this->app->make(Services\Support\InlineKeyboardBuilder::class)
+      )
+    );
+  }
+
+  protected function registerReplyHandlers(Services\Handlers\ReplyDispatcher $dispatcher): void
+  {
+    $dispatcher->registerHandler(
+      new InputNumberReplyHandler(
+        $this->app->make(Services\Support\TelegramApi::class),
+        $this->app->make(UnitDiscovery::class),
+        $this->app->make(UnitConverterService::class)
       )
     );
   }

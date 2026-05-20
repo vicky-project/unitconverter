@@ -209,7 +209,6 @@ class CallbackHandler extends BaseCallbackHandler
       $state = $this->getState($chatId);
       $domain = $state['domain'] ?? null;
 
-      Log::debug('Callback action'. $action);
       if ($action === 'back') {
         $this->clearState($chatId);
         return [
@@ -350,9 +349,11 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }
 
+      // ... dalam handleToSelect, setelah resolve short ID dan menyimpan toId
+
       $state['toId'] = $realId;
-      $state['waitingInput'] = true;
-      $this->setState($chatId, $state);
+      // Hapus baris $state['waitingInput'] = true; // tidak perlu lagi
+      $this->setState($chatId, $state); // tetap simpan fromId, toId, domain
 
       $fromUnit = $this->unitDiscovery->find($fromId);
       $toUnit = $this->unitDiscovery->find($realId);
@@ -366,14 +367,18 @@ class CallbackHandler extends BaseCallbackHandler
       $message .= "Balas pesan ini dengan angka yang ingin dikonversi\\.\n";
       $message .= "_Contoh: `42.5`_";
 
-      return [
-        'success' => true,
-        'status' => 'waiting_input',
-        'edit_message' => [
-          'text' => $message,
-          'parse_mode' => 'MarkdownV2',
+      // Gunakan expectReply untuk force reply
+      return $this->expectReply(
+        $chatId,
+        $this->buildModuleCallback('input', 'number'), // identifier = unitconverter:input:number
+        [
+          'fromId' => $fromId,
+          'toId' => $realId,
         ],
-      ];
+        $message,
+        null, // messageId (biarkan null agar mengirim pesan baru)
+        null // replyMarkup (default force_reply)
+      );
     }
 
     // ----- handleInput (teks angka) -----
