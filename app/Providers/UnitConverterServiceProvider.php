@@ -7,8 +7,10 @@ use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Modules\Telegram\Services;
 use Modules\UnitConverter\Sevices\UnitDiscovery;
 use Modules\UnitConverter\Sevices\UnitConverterService;
+use Modules\UnitConverter\Telegram\ConvertCommand;
 use PhpUnitConversion\Map as UnitMap;
 
 class UnitConverterServiceProvider extends ServiceProvider
@@ -51,6 +53,11 @@ class UnitConverterServiceProvider extends ServiceProvider
       __DIR__ . '/../app/Custom/Torque',
       'Modules\\UnitConverter\\Custom\\Torque'
     );
+
+    if ($this->app->bound(Services\Handlers\CommandDispatcher::class)) {
+      $dispatcher = $this->app->make(Services\Handlers\CommandDispatcher::class);
+      $this->registerTelegramCommands($dispatcher);
+    }
   }
 
   /**
@@ -63,6 +70,17 @@ class UnitConverterServiceProvider extends ServiceProvider
 
     $this->app->singleton(UnitDiscovery::class);
     $this->app->singleton(UnitConverterService::class);
+  }
+
+  protected function registerTelegramCommands(Services\Handlers\CommandDispatcher $dispatcher): void
+  {
+    $dispatcher->registerCommand(
+      new ConvertCommand(
+        $this->app->make(Services\Support\TelegramApi::class),
+        $this->app->make(UnitDiscovery::class),
+        $this->app->make(Services\Support\InlineKeyboardBuilder::class),
+      )
+    );
   }
 
   /**
