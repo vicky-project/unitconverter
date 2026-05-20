@@ -94,7 +94,7 @@
           targetSelect.appendChild(option);
         });
         targetSelect.disabled = false;
-        if (countSpan) countSpan.textContent = `(${units.lengtg})`;
+        if (countSpan) countSpan.textContent = `(${units.length})`;
       } catch (err) {
         tgApp.showToast('Gagal memuat satuan', 'danger');
       }
