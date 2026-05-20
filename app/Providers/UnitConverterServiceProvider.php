@@ -47,6 +47,10 @@ class UnitConverterServiceProvider extends ServiceProvider
       __DIR__ . '/../app/Custom/DigitalStorage',
       'Modules\\UnitConverter\\Custom\\DigitalStorage'
     );
+    UnitMap::add(
+      __DIR__ . '/../app/Custom/Torque',
+      'Modules\\UnitConverter\\Custom\\Torque'
+    );
   }
 
   /**

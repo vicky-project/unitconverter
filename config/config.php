@@ -357,5 +357,17 @@ return [
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\ExbiByte::class, 'system' => 'IEC'],
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\ZebiByte::class, 'system' => 'IEC'],
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\YobiByte::class, 'system' => 'IEC'],
+
+    // ==================== Torque ====================
+    ['class' => Modules\UnitConverter\Custom\Torque\NewtonMeter::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Torque\KiloNewtonMeter::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Torque\KilogramForceMeter::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Torque\DyneCentimeter::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Torque\PoundForceFoot::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Torque\PoundForceInch::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Torque\OunceForceFoot::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Torque\OunceForceInch::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Torque\FootPoundal::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Torque\InchPoundal::class, 'system' => 'Imperial'],
   ]
 ];
