@@ -2,6 +2,8 @@
 
 namespace Modules\UnitConverter\Services;
 
+use Illuminate\Support\Facades\Cache;
+
 class UnitDiscovery
 {
   protected array $units;
@@ -10,9 +12,6 @@ class UnitDiscovery
     $this->units = config('unitconverter.units', []);
   }
 
-  /**
-  * Get all units grouped by system.
-  */
   public function getGroupedBySystem(): array
   {
     $grouped = [];
@@ -22,8 +21,8 @@ class UnitDiscovery
 
       $grouped[$system][] = [
         'id' => $this->makeId($class),
-        'name' => (new $class())->getLabel(),
-        'symbol' => (new $class())->getSymbol(),
+        'name' => $class::LABEL,
+        'symbol' => $class::SYMBOL,
         'system' => $system,
         'class' => $class,
       ];
@@ -32,9 +31,6 @@ class UnitDiscovery
     return $grouped;
   }
 
-  /**
-  * Get list of unique domains with their names.
-  */
   public function getDomains(): array
   {
     $domains = [];
@@ -44,16 +40,12 @@ class UnitDiscovery
         $domains[$domain] = [
           'key' => $domain,
           'name' => ucfirst($domain),
-          // bisa di-custom nanti
         ];
       }
     }
     return array_values($domains);
   }
 
-  /**
-  * Get units by domain.
-  */
   public function getUnitsByDomain(string $domain): array
   {
     $result = [];
@@ -61,13 +53,43 @@ class UnitDiscovery
       if ($this->getDomain($unit['class']) === $domain) {
         $result[] = [
           'id' => $this->makeId($unit['class']),
-          'name' => (new $unit['class']())->getLabel(),
-          'symbol' => (new $unit['class']())->getSymbol(),
+          'name' => $unit['class']::LABEL,
+          'symbol' => $unit['class']::SYMBOL,
           'system' => $unit['system'],
         ];
       }
     }
     return $result;
+  }
+
+  /**
+  * Get units by domain with short IDs (indeks numerik 0, 1, 2...).
+  * Short IDs mapping disimpan di cache untuk di-resolve nanti.
+  */
+  public function getUnitsByDomainWithShortIds(string $domain): array
+  {
+    $units = $this->getUnitsByDomain($domain);
+    $mapping = [];
+    $result = [];
+
+    foreach ($units as $index => $unit) {
+      $shortId = (string) $index;
+      $mapping[$shortId] = $unit['id'];
+      $result[] = array_merge($unit, ['short_id' => $shortId]);
+    }
+
+    Cache::put("unitconv_short_{$domain}", $mapping, 3600);
+
+    return $result;
+  }
+
+  /**
+  * Resolve short ID ke real ID berdasarkan domain.
+  */
+  public function resolveShortId(string $domain, string $shortId): ?string
+  {
+    $mapping = Cache::get("unitconv_short_{$domain}", []);
+    return $mapping[$shortId] ?? null;
   }
 
   public function find(string $id): ?array
@@ -76,8 +98,8 @@ class UnitDiscovery
       if ($this->makeId($unit['class']) === $id) {
         return [
           'id' => $id,
-          'name' => (new $unit['class']())->getLabel(),
-          'symbol' => (new $unit['class']())->getSymbol(),
+          'name' => $unit['class']::LABEL,
+          'symbol' => $unit['class']::SYMBOL,
           'class' => $unit['class'],
         ];
       }
@@ -92,13 +114,11 @@ class UnitDiscovery
     if (!$unit1 || !$unit2) {
       return false;
     }
-
     return $this->getDomain($unit1['class']) === $this->getDomain($unit2['class']);
   }
 
   protected function getDomain(string $class): string
   {
-    // PhpUnitConversion\Unit\Area\Acre → Area
     $parts = explode('\\', $class);
     if (isset($parts[2]) && $parts[2] === 'Custom') {
       return $parts[3] ?? '';
