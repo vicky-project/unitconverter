@@ -82,13 +82,8 @@ class InputNumberReplyHandler extends BaseReplyHandler
       $message = "*✅ Hasil Konversi*\n\n";
       $message .= "{$value} {$fromLabel} = *{$result['result']} {$toLabel}*\n";
       $message .= "\n⸻\n";
-      $message .= "Kirim angka lagi untuk konversi baru\\.\n";
-      $message .= "Ketik /convert untuk ganti satuan\\.";
-
-      Log::debug("Accept reply message", [
-        'result' => $result,
-        'value' => $value
-      ]);
+      $message .= "Kirim angka lagi untuk konversi baru.\n";
+      $message .= "Ketik /convert untuk ganti satuan.";
 
       $this->sendMessage(
         chatId: $chatId,
