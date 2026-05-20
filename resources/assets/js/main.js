@@ -1,11 +1,13 @@
 (function(ns) {
   document.addEventListener('DOMContentLoaded', function() {
+    // ----- DOM element -----
     const domainSelect = document.getElementById('domainSelect');
     const fromSelect = document.getElementById('fromUnit');
     const toSelect = document.getElementById('toUnit');
     const valueInput = document.getElementById('valueInput');
     const convertBtn = document.getElementById('convertBtn');
     const swapBtn = document.getElementById('swapUnitsBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const resultContainer = document.getElementById('resultContainer');
     const resultValue = document.getElementById('resultValue');
     const resultUnitSymbol = document.getElementById('resultUnitSymbol');
@@ -14,19 +16,17 @@
     const reverseBtn = document.getElementById('reverseBtn');
     const errorContainer = document.getElementById('errorContainer');
     const errorMessage = document.getElementById('errorMessage');
-    const resetBtn = document.getElementById('resetBtn');
     const fromUnitCount = document.getElementById('fromUnitCount');
     const toUnitCount = document.getElementById('toUnitCount');
 
+    // ----- Helper UI -----
     function showError(msg) {
       errorContainer.classList.remove('d-none');
       errorMessage.textContent = msg;
     }
-
     function hideError() {
       errorContainer.classList.add('d-none');
     }
-
     function showResult(data) {
       resultContainer.classList.remove('d-none');
       resultValue.textContent = data.result;
@@ -37,23 +37,7 @@
       ns.currentResult = data.result;
     }
 
-    // Fungsi reset
-    function resetForm() {
-      domainSelect.value = '';
-      localStorage.removeItem('unit_last_domain');
-      fromSelect.innerHTML = '<option value="">Pilih satuan</option>';
-      toSelect.innerHTML = '<option value="">Pilih satuan</option>';
-      fromSelect.disabled = true;
-      toSelect.disabled = true;
-      fromUnitCount.textContent = '';
-      toUnitCount.textContent = '';
-      valueInput.value = '';
-      hideError();
-      resultContainer.classList.add('d-none');
-      // Hapus focus dari input
-      valueInput.blur();
-    }
-
+    // ----- Load Domains -----
     async function loadDomains() {
       try {
         const resp = await ns.fetchWithAuth(ns.BASE_URL + '/api/units/domains');
@@ -75,6 +59,7 @@
       }
     }
 
+    // ----- Load Units (dengan indikator jumlah) -----
     async function loadUnitsForDomain(domain, targetSelect, countSpan) {
       targetSelect.innerHTML = '<option value="">Memuat...</option>';
       targetSelect.disabled = true;
@@ -100,6 +85,7 @@
       }
     }
 
+    // ----- Domain change -----
     domainSelect.addEventListener('change', function() {
       const domain = this.value;
       localStorage.setItem('unit_last_domain', domain);
@@ -112,9 +98,48 @@
       if (domain) {
         loadUnitsForDomain(domain, fromSelect, fromUnitCount);
         loadUnitsForDomain(domain, toSelect, toUnitCount);
+      } else {
+        fromUnitCount.textContent = '';
+        toUnitCount.textContent = '';
       }
+      validateForm();
     });
 
+    // ----- Validasi input halus -----
+    function validateForm() {
+      const domain = domainSelect.value;
+      const fromId = fromSelect.value;
+      const toId = toSelect.value;
+      const rawValue = valueInput.value.trim();
+
+      if (!domain || !fromId || !toId) {
+        convertBtn.disabled = true;
+        valueInput.classList.remove('is-invalid');
+        return;
+      }
+      if (rawValue === '') {
+        convertBtn.disabled = true;
+        valueInput.classList.remove('is-invalid');
+        return;
+      }
+      const parsed = parseFloat(rawValue);
+      const isValidNumber = !isNaN(parsed) && /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(rawValue);
+      if (!isValidNumber) {
+        convertBtn.disabled = true;
+        valueInput.classList.add('is-invalid');
+        return;
+      }
+      valueInput.classList.remove('is-invalid');
+      convertBtn.disabled = false;
+    }
+
+    domainSelect.addEventListener('change', validateForm);
+    fromSelect.addEventListener('change', validateForm);
+    toSelect.addEventListener('change', validateForm);
+    valueInput.addEventListener('input', validateForm);
+    convertBtn.disabled = true; // state awal
+
+    // ----- Konversi -----
     async function doConversion() {
       const value = parseFloat(valueInput.value);
       const fromId = fromSelect.value;
@@ -156,10 +181,11 @@
     valueInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        doConversion();
+        if (!convertBtn.disabled) doConversion();
       }
     });
 
+    // ----- Swap -----
     swapBtn.addEventListener('click',
       function() {
         const fromVal = fromSelect.value;
@@ -168,9 +194,10 @@
         toSelect.value = fromVal;
         hideError();
         resultContainer.classList.add('d-none');
+        validateForm();
       });
 
-    // Tombol Balik Konversi
+    // ----- Balik Konversi (reverse) -----
     reverseBtn.addEventListener('click',
       function() {
         const fromVal = fromSelect.value;
@@ -180,6 +207,7 @@
         doConversion();
       });
 
+    // ----- Salin hasil -----
     copyResultBtn.addEventListener('click',
       function() {
         if (ns.currentResult) {
@@ -187,9 +215,28 @@
         }
       });
 
+    // ----- Reset -----
+    function resetForm() {
+      domainSelect.value = '';
+      localStorage.removeItem('unit_last_domain');
+      fromSelect.innerHTML = '<option value="">Pilih satuan</option>';
+      toSelect.innerHTML = '<option value="">Pilih satuan</option>';
+      fromSelect.disabled = true;
+      toSelect.disabled = true;
+      fromUnitCount.textContent = '';
+      toUnitCount.textContent = '';
+      valueInput.value = '';
+      hideError();
+      resultContainer.classList.add('d-none');
+      valueInput.blur();
+      convertBtn.disabled = true;
+      valueInput.classList.remove('is-invalid');
+    }
+
     resetBtn.addEventListener('click',
       resetForm);
 
+    // ----- Inisialisasi -----
     loadDomains();
   });
 })(window.UnitConverter);
