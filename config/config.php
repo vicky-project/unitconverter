@@ -301,10 +301,12 @@ return [
     ['class' => Modules\UnitConverter\Custom\Pressure\InchOfMercury::class, 'system' => 'Imperial'],
     ['class' => Modules\UnitConverter\Custom\Pressure\FootOfMercury::class, 'system' => 'Imperial'],
     ['class' => Modules\UnitConverter\Custom\Pressure\Barye::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\Kilobarye::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\DynePerSquareCentimeter::class, 'system' => 'Metric'],
 
     // ==================== Energy ====================
     ['class' => Modules\UnitConverter\Custom\Energy\Joule::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Erg::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Energy\KiloJoule::class, 'system' => 'SI'],
     ['class' => Modules\UnitConverter\Custom\Energy\MegaJoule::class, 'system' => 'SI'],
     ['class' => Modules\UnitConverter\Custom\Energy\GigaJoule::class, 'system' => 'SI'],
@@ -324,6 +326,10 @@ return [
     ['class' => Modules\UnitConverter\Custom\Energy\Hartree::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Energy\Rydberg::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Energy\LiterAtmosphere::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\ElectronVolt::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\Thermie::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\MegaWattHour::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Energy\GigaWattHour::class, 'system' => 'Metric'],
 
     // ==================== Frequency ====================
     ['class' => Modules\UnitConverter\Custom\Frequency\Hertz::class, 'system' => 'SI'],
@@ -338,6 +344,9 @@ return [
     ['class' => Modules\UnitConverter\Custom\Frequency\RevolutionPerSecond::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Frequency\CyclePerSecond::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Frequency\RadianPerSecond::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Frequency\PetaHertz::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Frequency\ExaHertz::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Frequency\DegreePerSecond::class, 'system' => 'Metric'],
 
     // ==================== Digital Storage ====================
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\Bit::class, 'system' => 'Metric'],
@@ -359,6 +368,10 @@ return [
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\ExbiByte::class, 'system' => 'IEC'],
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\ZebiByte::class, 'system' => 'IEC'],
     ['class' => Modules\UnitConverter\Custom\DigitalStorage\YobiByte::class, 'system' => 'IEC'],
+    ['class' => Modules\UnitConverter\Custom\DigitalStorage\Word::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\DigitalStorage\KiloBit::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\DigitalStorage\MegaBit::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\DigitalStorage\GigaBit::class, 'system' => 'Metric'],
 
     // ==================== Torque ====================
     ['class' => Modules\UnitConverter\Custom\Torque\NewtonMeter::class, 'system' => 'SI'],
