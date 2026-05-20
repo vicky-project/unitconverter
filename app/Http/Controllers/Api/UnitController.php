@@ -49,4 +49,18 @@ class UnitController extends Controller
       return response()->json(['error' => $e->getMessage()], 400);
     }
   }
+
+  public function domains(): JsonResponse
+  {
+    return response()->json(['data' => $this->discovery->getDomains()]);
+  }
+
+  public function unitsByDomain(string $domain): JsonResponse
+  {
+    $units = $this->discovery->getUnitsByDomain($domain);
+    if (empty($units)) {
+      return response()->json(['error' => 'Domain not found.'], 404);
+    }
+    return response()->json(['data' => $units]);
+  }
 }
