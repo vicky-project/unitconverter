@@ -329,7 +329,7 @@
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menyimpan...';
 
         try {
-          await fetchWithAuth(window.NotesConfig.notesEndpoint, {
+          await ns.fetchWithAuth(window.NotesConfig.notesEndpoint, {
             method: 'POST',
             body: JSON.stringify(payload)
           });
