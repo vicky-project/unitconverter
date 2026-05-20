@@ -11,6 +11,7 @@ use Modules\Telegram\Services;
 use Modules\UnitConverter\Services\UnitDiscovery;
 use Modules\UnitConverter\Services\UnitConverterService;
 use Modules\UnitConverter\Telegram\ConvertCommand;
+use Modules\UnitConverter\Telegram\CallbackHandler;
 use PhpUnitConversion\Map as UnitMap;
 
 class UnitConverterServiceProvider extends ServiceProvider
@@ -58,6 +59,11 @@ class UnitConverterServiceProvider extends ServiceProvider
       $dispatcher = $this->app->make(Services\Handlers\CommandDispatcher::class);
       $this->registerTelegramCommands($dispatcher);
     }
+
+    if ($this->app->bound(Services\Handlers\CallbackHandler::class)) {
+      $callback = $this->app->make(Services\Handlers\CallbackHandler::class);
+      $this->registerCallbackHandlers($callback);
+    }
   }
 
   /**
@@ -78,7 +84,19 @@ class UnitConverterServiceProvider extends ServiceProvider
       new ConvertCommand(
         $this->app->make(Services\Support\TelegramApi::class),
         $this->app->make(UnitDiscovery::class),
-        $this->app->make(Services\Support\InlineKeyboardBuilder::class),
+        $this->app->make(Services\Support\InlineKeyboardBuilder::class)
+      )
+    );
+  }
+
+  protected function registerCallbackHandlers(Services\Handlers\CallbackHandler $callback): void
+  {
+    $callback->registerHandler(
+      new CallbackHandler(
+        $this->app->make(Services\Support\TelegramApi::class),
+        $this->app->make(UnitDiscovery::class),
+        $this->app->make(UnitConverterService::class),
+        $this->app->make(Services\Support\InlineKeyboardBuilder::class)
       )
     );
   }
