@@ -88,7 +88,8 @@ class InputNumberReplyHandler extends BaseReplyHandler
       $this->sendMessage(
         chatId: $chatId,
         text: $message,
-        parseMode: 'MarkdownV2'
+        parseMode: 'MarkdownV2',
+        options: ['auto_escape' => true]
       );
       return [
         'status' => 'conversion_done',

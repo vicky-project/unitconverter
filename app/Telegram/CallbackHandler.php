@@ -137,7 +137,7 @@ class CallbackHandler extends BaseCallbackHandler
     }
 
     // ----- handleDomainSelect -----
-    private function handleDomainSelect(string $action, string $id, int $chatId, ?int $messageId): array
+    private function handleDomainSelect(string $action, ?string $id, int $chatId, ?int $messageId): array
     {
 
       if ($action === 'back') {
@@ -152,6 +152,13 @@ class CallbackHandler extends BaseCallbackHandler
       if ($action !== 'select') {
         return ['success' => false,
           'status' => 'invalid_action'];
+      }
+
+      if (is_null($id)) {
+        return [
+          'success' => false,
+          'status' => 'id_not_found',
+        ];
       }
 
       $units = $this->unitDiscovery->getUnitsByDomainWithShortIds($id);
