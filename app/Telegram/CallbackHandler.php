@@ -66,6 +66,10 @@ class CallbackHandler extends BaseCallbackHandler
     $id = $data['id'] ?? null;
     $chatId = $context['chat_id'] ?? 0;
     $messageId = $context['message_id'] ?? null;
+    Log::debug('Callback handler converter', [
+      'data' => $data,
+      'context' => $context
+    ]);
 
     return match ($entity) {
       'domain' => $this->handleDomainSelect($action, $id, $chatId, $messageId),
