@@ -364,6 +364,8 @@ class CallbackHandler extends BaseCallbackHandler
       $message .= "Balas pesan ini dengan angka yang ingin dikonversi.\n";
       $message .= "_Contoh: `42.5`_";
 
+      $this->deleteMessage($chatId, $messageId);
+
       return $this->expectReply(
         $chatId,
         'unitconverter:input:number', // identifier handler

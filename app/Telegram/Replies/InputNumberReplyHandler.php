@@ -72,10 +72,6 @@ class InputNumberReplyHandler extends BaseReplyHandler
 
     try {
       $result = $this->converterService->convert($value, $fromId, $toId);
-      Log::debug("Accept reply message", [
-        'result' => $result,
-        'value' => $value
-      ]);
 
       $fromUnit = $this->unitDiscovery->find($fromId);
       $toUnit = $this->unitDiscovery->find($toId);
@@ -89,6 +85,16 @@ class InputNumberReplyHandler extends BaseReplyHandler
       $message .= "Kirim angka lagi untuk konversi baru\\.\n";
       $message .= "Ketik /convert untuk ganti satuan\\.";
 
+      Log::debug("Accept reply message", [
+        'result' => $result,
+        'value' => $value
+      ]);
+
+      $this->sendMessage(
+        chatId: $chatId,
+        text: $message,
+        parseMode: 'MarkdownV2'
+      );
       return [
         'status' => 'conversion_done',
         'send_message' => [
