@@ -2,6 +2,7 @@
 
 namespace Modules\UnitConverter\Telegram;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Modules\UnitConverter\Services\UnitDiscovery;
 use Modules\UnitConverter\Services\UnitConverterService;
@@ -14,9 +15,6 @@ class CallbackHandler extends BaseCallbackHandler
   protected UnitDiscovery $unitDiscovery;
   protected UnitConverterService $converterService;
   protected InlineKeyboardBuilder $inlineKeyboard;
-
-  // State user: menyimpan fromId per chatId
-  protected array $userState = [];
 
   public function __construct(
     TelegramApi $telegramApi,
@@ -81,11 +79,73 @@ class CallbackHandler extends BaseCallbackHandler
       };
     }
 
+    // ----- State management dengan cache -----
+    private function getState(int $chatId): array
+    {
+      return Cache::get("unitconv_state_{$chatId}", []);
+    }
+
+    private function setState(int $chatId, array $state): void
+    {
+      Cache::put("unitconv_state_{$chatId}", $state, 3600); // 1 jam
+    }
+
+    private function clearState(int $chatId): void
+    {
+      Cache::forget("unitconv_state_{$chatId}");
+    }
+
+    // ----- Helper untuk membangun tombol kembali -----
+    private function backButton(string $entity, string $action = 'back'): array
+    {
+      $this->inlineKeyboard->setModule('unitconverter');
+      $this->inlineKeyboard->setEntity($entity);
+
+      return [
+        [
+          'text' => '« Kembali',
+          'callback_data' => [
+            'action' => $action,
+            'value' => null,
+          ],
+        ],
+      ];
+    }
+
     /**
     * User memilih domain → tampilkan satuan "from"
     */
     private function handleDomainSelect(string $action, string $id, int $chatId, ?int $messageId): array
     {
+      if ($action === 'back') {
+        // Kembali ke daftar domain
+        $domains = $this->unitDiscovery->getDomains();
+        $this->inlineKeyboard->setModule('unitconverter');
+        $this->inlineKeyboard->setEntity('domain');
+
+        $items = array_map(function ($domain) {
+          return [
+            'text' => $domain['name'],
+            'callback_data' => [
+              'action' => 'select',
+              'value' => $domain['key'],
+            ],
+          ];
+        }, $domains);
+
+        return [
+          'success' => true,
+          'status' => 'back_to_domains',
+          'edit_message' => [
+            'text' => "*🔀 Konversi Satuan*\n\nPilih domain:",
+            'parse_mode' => 'MarkdownV2',
+            'reply_markup' => [
+              'inline_keyboard' => $this->inlineKeyboard->grid($items, 3),
+            ],
+          ],
+        ];
+      }
+
       if ($action !== 'select') {
         return ['success' => false,
           'status' => 'invalid_action'];
@@ -101,11 +161,13 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }
 
-      // Reset state user
-      $this->userState[$chatId] = [
+      // Simpan state
+      $this->setState($chatId, [
         'domain' => $id,
         'fromId' => null,
-      ];
+        'toId' => null,
+        'waitingInput' => false,
+      ]);
 
       $this->inlineKeyboard->setModule('unitconverter');
       $this->inlineKeyboard->setEntity('from');
@@ -114,23 +176,14 @@ class CallbackHandler extends BaseCallbackHandler
         return [
           'text' => $unit['symbol'] . ' - ' . $unit['name'],
           'callback_data' => [
-            'entity' => 'from',
             'action' => 'select',
-            'id' => $unit['id'],
+            'value' => $unit['id'],
           ],
         ];
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
-
-      // Tambahkan tombol kembali
-      $keyboards[] = [[
-        'text' => '« Kembali',
-        'callback_data' => json_encode([
-          'entity' => 'domain',
-          'action' => 'back',
-        ]),
-      ]];
+      $keyboards[] = $this->backButton('domain', 'back');
 
       $message = "*Pilih Satuan Sumber*\n";
       $message .= "Domain: *{$id}*\n";
@@ -153,12 +206,43 @@ class CallbackHandler extends BaseCallbackHandler
     */
     private function handleFromSelect(string $action, string $id, int $chatId, ?int $messageId): array
     {
+      $state = $this->getState($chatId);
+
+      if ($action === 'back') {
+        // Kembali ke daftar domain
+        $domains = $this->unitDiscovery->getDomains();
+        $this->inlineKeyboard->setModule('unitconverter');
+        $this->inlineKeyboard->setEntity('domain');
+
+        $items = array_map(function ($domain) {
+          return [
+            'text' => $domain['name'],
+            'callback_data' => [
+              'action' => 'select',
+              'value' => $domain['key'],
+            ],
+          ];
+        }, $domains);
+
+        return [
+          'success' => true,
+          'status' => 'back_to_domains',
+          'edit_message' => [
+            'text' => "*🔀 Konversi Satuan*\n\nPilih domain:",
+            'parse_mode' => 'MarkdownV2',
+            'reply_markup' => [
+              'inline_keyboard' => $this->inlineKeyboard->grid($items, 3),
+            ],
+          ],
+        ];
+      }
+
       if ($action !== 'select') {
         return ['success' => false,
           'status' => 'invalid_action'];
       }
 
-      $domain = $this->userState[$chatId]['domain'] ?? null;
+      $domain = $state['domain'] ?? null;
       if (!$domain) {
         return [
           'success' => false,
@@ -168,7 +252,8 @@ class CallbackHandler extends BaseCallbackHandler
       }
 
       // Simpan fromId
-      $this->userState[$chatId]['fromId'] = $id;
+      $state['fromId'] = $id;
+      $this->setState($chatId, $state);
 
       $units = $this->unitDiscovery->getUnitsByDomain($domain);
 
@@ -179,25 +264,15 @@ class CallbackHandler extends BaseCallbackHandler
         return [
           'text' => $unit['symbol'] . ' - ' . $unit['name'],
           'callback_data' => [
-            'entity' => 'to',
             'action' => 'select',
-            'id' => $unit['id'],
+            'value' => $unit['id'],
           ],
         ];
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
+      $keyboards[] = $this->backButton('from', 'back');
 
-      // Tombol kembali
-      $keyboards[] = [[
-        'text' => '« Kembali',
-        'callback_data' => json_encode([
-          'entity' => 'from',
-          'action' => 'back',
-        ]),
-      ]];
-
-      // Ambil nama unit from
       $fromUnit = $this->unitDiscovery->find($id);
       $fromLabel = $fromUnit ? $fromUnit['symbol'] . ' (' . $fromUnit['name'] . ')' : $id;
 
@@ -223,12 +298,52 @@ class CallbackHandler extends BaseCallbackHandler
     */
     private function handleToSelect(string $action, string $id, int $chatId, ?int $messageId): array
     {
+      $state = $this->getState($chatId);
+
+      if ($action === 'back') {
+        // Kembali ke daftar from
+        $domain = $state['domain'] ?? null;
+        if (!$domain) {
+          return [
+            'success' => false,
+            'status' => 'no_domain',
+            'answer' => 'Sesi habis, silakan /convert lagi',
+          ];
+        }
+
+        $units = $this->unitDiscovery->getUnitsByDomain($domain);
+        $this->inlineKeyboard->setModule('unitconverter');
+        $this->inlineKeyboard->setEntity('from');
+
+        $items = array_map(function ($unit) {
+          return [
+            'text' => $unit['symbol'] . ' - ' . $unit['name'],
+            'callback_data' => [
+              'action' => 'select',
+              'value' => $unit['id'],
+            ],
+          ];
+        }, $units);
+
+        $keyboards = $this->inlineKeyboard->grid($items, 2);
+        $keyboards[] = $this->backButton('domain', 'back');
+
+        return [
+          'success' => true,
+          'status' => 'back_to_from',
+          'edit_message' => [
+            'text' => "*Pilih Satuan Sumber*\nDomain: *{$domain}*",
+            'parse_mode' => 'MarkdownV2',
+            'reply_markup' => ['inline_keyboard' => $keyboards],
+          ],
+        ];
+      }
+
       if ($action !== 'select') {
         return ['success' => false,
           'status' => 'invalid_action'];
       }
 
-      $state = $this->userState[$chatId] ?? [];
       $fromId = $state['fromId'] ?? null;
 
       if (!$fromId) {
@@ -239,9 +354,10 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }
 
-      // Simpan toId dan set state menunggu input angka
-      $this->userState[$chatId]['toId'] = $id;
-      $this->userState[$chatId]['waitingInput'] = true;
+      // Simpan toId dan set waiting input
+      $state['toId'] = $id;
+      $state['waitingInput'] = true;
+      $this->setState($chatId, $state);
 
       $fromUnit = $this->unitDiscovery->find($fromId);
       $toUnit = $this->unitDiscovery->find($id);
@@ -267,21 +383,20 @@ class CallbackHandler extends BaseCallbackHandler
 
     /**
     * Handle text message (input angka) untuk konversi yang sedang menunggu
-    * Method ini akan dipanggil dari luar saat user mengirim pesan teks
     */
     public function handleInput(int $chatId, string $text): ?array
     {
-      $state = $this->userState[$chatId] ?? [];
+      $state = $this->getState($chatId);
 
       if (!($state['waitingInput'] ?? false)) {
-        return null; // tidak dalam mode menunggu input
+        return null;
       }
 
       $fromId = $state['fromId'] ?? null;
       $toId = $state['toId'] ?? null;
 
       if (!$fromId || !$toId) {
-        $this->userState[$chatId] = [];
+        $this->clearState($chatId);
         return null;
       }
 
@@ -299,7 +414,6 @@ class CallbackHandler extends BaseCallbackHandler
 
       $value = (float) $value;
 
-      // Lakukan konversi
       try {
         $result = $this->converterService->convert($value, $fromId, $toId);
 
@@ -315,8 +429,9 @@ class CallbackHandler extends BaseCallbackHandler
         $message .= "Kirim angka lagi untuk konversi baru\\.\n";
         $message .= "Ketik /convert untuk ganti satuan\\.";
 
-        // Reset waiting input, tetap simpan fromId dan toId
-        $this->userState[$chatId]['waitingInput'] = false;
+        // Reset waiting input, tetap simpan fromId & toId
+        $state['waitingInput'] = false;
+        $this->setState($chatId, $state);
 
         return [
           'status' => 'conversion_done',
@@ -335,11 +450,9 @@ class CallbackHandler extends BaseCallbackHandler
       }
     }
 
-    /**
-    * Cek apakah user sedang dalam mode menunggu input
-    */
     public function isWaitingInput(int $chatId): bool
     {
-      return $this->userState[$chatId]['waitingInput'] ?? false;
+      $state = $this->getState($chatId);
+      return $state['waitingInput'] ?? false;
     }
   }

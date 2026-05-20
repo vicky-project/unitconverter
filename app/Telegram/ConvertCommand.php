@@ -91,9 +91,8 @@ class ConvertCommand extends BaseCommandHandler
       return [
         'text' => $domain['name'],
         'callback_data' => [
-          'entity' => 'domain',
           'action' => 'select',
-          'id' => $domain['key'],
+          'value' => $domain['key'],
         ],
       ];
     }, $domains);
