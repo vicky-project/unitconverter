@@ -54,43 +54,41 @@
   <!-- Hasil Konversi -->
   <div id="resultContainer" class="d-none">
     <div class="card border-success overflow-hidden">
-      <div class="card-body d-flex justify-content-between align-items-start gap-3">
-        <div class="row d-flex mb-2">
-          <div class="text-muted small mb-1">
-            Hasil Konversi
-          </div>
-          <!-- Sisi kanan: tombol aksi -->
-          <div class="d-flex gap-2 flex-shrink-0 align-self-start">
-            <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
-              <i class="bi bi-arrow-left-right"></i>
-            </button>
-            <button class="btn btn-outline-secondary btn-sm" id="copyResultBtn" title="Salin hasil">
-              <i class="bi bi-clipboard"></i>
-            </button>
-            <div id="saveToNotesContainer"></div>
-          </div>
-        </div>
 
-        <!-- Sisi kiri: informasi hasil -->
-        <div class="flex-grow-1" style="min-width: 0;">
-
-          <!-- Info dari satuan asal -->
-          <div class="text-muted small mb-2">
-            <span id="resultFromInfo"></span>
-          </div>
-
-          <!-- Angka hasil utama + simbol -->
-          <div class="d-flex align-items-baseline flex-wrap mb-1" style="overflow-wrap: anywhere;">
-            <span id="resultValue" class="fw-bold text-success me-2 text-break"
-              style="font-size: 2.5rem; line-height: 1.2; word-break: break-all;"></span>
-            <span id="resultUnitSymbol" class="text-secondary flex-shrink-0"
-              style="font-size: 1.25rem;"></span>
-          </div>
-
-          <!-- Format cerdas (italic) -->
-          <div class="text-muted small fst-italic text-break" id="resultSmartFormat"></div>
+      <!-- Baris header: judul + tombol aksi -->
+      <div class="card-header d-flex justify-content-between align-items-center py-2 px-3"
+        style="background-color: var(--tg-theme-secondary-bg-color); border-bottom: 1px solid var(--tg-theme-section-separator-color);">
+        <span class="fw-semibold small">Hasil Konversi</span>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
+            <i class="bi bi-arrow-left-right"></i>
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" id="copyResultBtn" title="Salin hasil">
+            <i class="bi bi-clipboard"></i>
+          </button>
+          <div id="saveToNotesContainer"></div>
         </div>
       </div>
+
+      <!-- Body: konten hasil -->
+      <div class="card-body" style="min-width: 0;">
+        <!-- Info dari satuan asal -->
+        <div class="text-muted small mb-2">
+          <span id="resultFromInfo"></span>
+        </div>
+
+        <!-- Angka hasil utama + simbol -->
+        <div class="d-flex align-items-baseline flex-wrap mb-1" style="overflow-wrap: anywhere;">
+          <span id="resultValue" class="fw-bold text-success me-2 text-break"
+            style="font-size: 2.5rem; line-height: 1.2; word-break: break-all;"></span>
+          <span id="resultUnitSymbol" class="text-secondary flex-shrink-0"
+            style="font-size: 1.25rem;"></span>
+        </div>
+
+        <!-- Format cerdas (italic) -->
+        <div class="text-muted small fst-italic text-break" id="resultSmartFormat"></div>
+      </div>
+
     </div>
   </div>
 
