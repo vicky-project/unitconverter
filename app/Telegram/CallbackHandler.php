@@ -209,6 +209,7 @@ class CallbackHandler extends BaseCallbackHandler
       $state = $this->getState($chatId);
       $domain = $state['domain'] ?? null;
 
+      Log::debug('Callback action'. $action);
       if ($action === 'back') {
         $this->clearState($chatId);
         return [
