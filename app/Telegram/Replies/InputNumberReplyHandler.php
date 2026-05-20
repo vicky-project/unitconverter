@@ -45,7 +45,7 @@ class InputNumberReplyHandler extends BaseReplyHandler
     int $replyToMessageId
   ): array {
     Log::debug("Accept reply message", [
-      'context' => $context
+      'context' => $context,
       'text' => $replyText
     ]);
     $fromId = $context['fromId'] ?? null;
