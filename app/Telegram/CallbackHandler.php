@@ -366,7 +366,7 @@ class CallbackHandler extends BaseCallbackHandler
 
       return $this->expectReply(
         $chatId,
-        'unitconverter:input:number', // identifier handler
+        'global:unitconverter:input:number', // identifier handler
         [
           'fromId' => $fromId,
           'toId' => $realId,
