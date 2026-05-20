@@ -185,7 +185,7 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
-      $keyboards[] = $this->inlineKeyboard->grid($this->backButton('domain'));
+      $keyboards = array_merge($this->inlineKeyboard->grid($this->backButton('domain')), $keyboards);
       Log::debug('Callback handler converter', [
         'keyboards' => $keyboards,
       ]);
