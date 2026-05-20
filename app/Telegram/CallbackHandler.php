@@ -104,6 +104,7 @@ class CallbackHandler extends BaseCallbackHandler
           'text' => '« Kembali',
           'callback_data' => [
             'action' => 'back',
+            'value' => '0'
           ],
         ],
       ];
