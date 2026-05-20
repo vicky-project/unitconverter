@@ -95,24 +95,6 @@ class CallbackHandler extends BaseCallbackHandler
       Cache::forget("unitconv_state_{$chatId}");
     }
 
-    // ----- Helper untuk membangun tombol kembali -----
-    private function backButton(string $entity, string $action = 'back'): array
-    {
-      $this->inlineKeyboard->setModule('unitconverter');
-      $this->inlineKeyboard->setEntity($entity);
-
-      return [
-        [
-          'text' => '« Kembali',
-          'callback_data' => [
-            'action' => $action,
-            'value' => '',
-            // string kosong, bukan null
-          ],
-        ],
-      ];
-    }
-
     // ----- Helper untuk daftar domain -----
     private function domainListEdit(): array
     {
@@ -187,7 +169,6 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
-      $keyboards[] = $this->backButton('domain', 'back');
 
       $message = "*Pilih Satuan Sumber*\n";
       $message .= "Domain: *{$id}*\n";
@@ -236,7 +217,6 @@ class CallbackHandler extends BaseCallbackHandler
         }, $units);
 
         $keyboards = $this->inlineKeyboard->grid($items, 2);
-        $keyboards[] = $this->backButton('domain', 'back');
 
         return [
           'success' => true,
@@ -292,7 +272,6 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
-      $keyboards[] = $this->backButton('from', 'back');
 
       $fromUnit = $this->unitDiscovery->find($realId);
       $fromLabel = $fromUnit ? $fromUnit['symbol'] . ' (' . $fromUnit['name'] . ')' : $realId;
@@ -346,7 +325,6 @@ class CallbackHandler extends BaseCallbackHandler
         }, $units);
 
         $keyboards = $this->inlineKeyboard->grid($items, 2);
-        $keyboards[] = $this->backButton('domain', 'back');
 
         return [
           'success' => true,
