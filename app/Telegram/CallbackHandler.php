@@ -185,10 +185,7 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
-      $keyboards = array_merge($this->inlineKeyboard->grid($this->backButton('domain')), $keyboards);
-      Log::debug('Callback handler converter', [
-        'keyboards' => $keyboards,
-      ]);
+      $keyboards = array_merge($keyboards, $this->inlineKeyboard->grid($this->backButton('domain')));
 
       $message = "*Pilih Satuan Sumber*\n";
       $message .= "Domain: *{$id}*\n";
@@ -262,7 +259,7 @@ class CallbackHandler extends BaseCallbackHandler
       }, $units);
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
-      $keyboards[] = $this->backButton('from');
+      $keyboards = array_merge($keyboards, $this->inlineKeyboard->grid($this->backButton('from')));
 
       $fromUnit = $this->unitDiscovery->find($realId);
       $fromLabel = $fromUnit ? $fromUnit['symbol'] . ' (' . $fromUnit['name'] . ')' : $realId;
@@ -317,7 +314,7 @@ class CallbackHandler extends BaseCallbackHandler
         }, $units);
 
         $keyboards = $this->inlineKeyboard->grid($items, 2);
-        $keyboards[] = $this->backButton('domain');
+        $keyboards = array_merge($keyboards, $this->inlineKeyboard->grid($this->backButton('domain')));
 
         return [
           'success' => true,
