@@ -274,6 +274,7 @@ return [
     ['class' => Modules\UnitConverter\Custom\Pressure\HectoPascal::class, 'system' => 'SI'],
     ['class' => Modules\UnitConverter\Custom\Pressure\MegaPascal::class, 'system' => 'SI'],
     ['class' => Modules\UnitConverter\Custom\Pressure\MilliPascal::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\NewtonPerSquareMeter::class, 'system' => 'SI'],
     ['class' => Modules\UnitConverter\Custom\Pressure\NewtonPerSquareMillimeter::class, 'system' => 'SI'],
     ['class' => Modules\UnitConverter\Custom\Pressure\Bar::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\Decibar::class, 'system' => 'Metric'],
@@ -287,6 +288,7 @@ return [
     ['class' => Modules\UnitConverter\Custom\Pressure\MillimeterOfWater::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\CentimeterOfWater::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\KgPerSquareCentimeter::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Pressure\KilogramForcePerSquareCentimeter::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\KilogramForcePerSquareMeter::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\KilogramForcePerSquareMillimeter::class, 'system' => 'Metric'],
     ['class' => Modules\UnitConverter\Custom\Pressure\GramForcePerSquareCentimeter::class, 'system' => 'Metric'],
@@ -369,5 +371,11 @@ return [
     ['class' => Modules\UnitConverter\Custom\Torque\OunceForceInch::class, 'system' => 'Imperial'],
     ['class' => Modules\UnitConverter\Custom\Torque\FootPoundal::class, 'system' => 'Imperial'],
     ['class' => Modules\UnitConverter\Custom\Torque\InchPoundal::class, 'system' => 'Imperial'],
+    ['class' => Modules\UnitConverter\Custom\Torque\KilogramForceCentimeter::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Torque\GramForceCentimeter::class, 'system' => 'Metric'],
+    ['class' => Modules\UnitConverter\Custom\Torque\NewtonCentimeter::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Torque\MilliNewtonMeter::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Torque\MicroNewtonMeter::class, 'system' => 'SI'],
+    ['class' => Modules\UnitConverter\Custom\Torque\MeganewtonMeter::class, 'system' => 'SI'],
   ]
 ];
