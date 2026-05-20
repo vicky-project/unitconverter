@@ -8,8 +8,8 @@ use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Modules\Telegram\Services;
-use Modules\UnitConverter\Sevices\UnitDiscovery;
-use Modules\UnitConverter\Sevices\UnitConverterService;
+use Modules\UnitConverter\Services\UnitDiscovery;
+use Modules\UnitConverter\Services\UnitConverterService;
 use Modules\UnitConverter\Telegram\ConvertCommand;
 use PhpUnitConversion\Map as UnitMap;
 
