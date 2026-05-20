@@ -104,10 +104,6 @@
 @endsection
 
 @push('scripts')
-<script src="//cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-</script>
 <script>
   window.UnitConverter = window.UnitConverter || {};
   window.UnitConverter.BASE_URL = '{{ rtrim(config("app.url"), "/") }}';
