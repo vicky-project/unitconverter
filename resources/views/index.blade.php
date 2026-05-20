@@ -54,21 +54,31 @@
   <!-- Hasil Konversi -->
   <div id="resultContainer" class="d-none">
     <div class="card border-success">
-      <div class="card-body d-flex justify-content-between align-items-start">
-        <div>
-          <div class="text-muted small">
+      <div class="card-body d-flex justify-content-between align-items-start gap-2">
+
+        <!-- Sisi kiri: informasi hasil -->
+        <div class="flex-grow-1">
+          <div class="text-muted small mb-1">
             Hasil Konversi
           </div>
-          <div class="text-muted small mt-1">
+
+          <!-- Info dari satuan asal -->
+          <div class="text-muted small mb-2">
             <span id="resultFromInfo"></span>
           </div>
-          <div class="d-flex align-items-baseline flex-wrap">
-            <span id="resultValue" class="fs-3 fw-bold text-success me-2"></span>
-            <span id="resultUnitSymbol" class="text-secondary fs-6"></span>
+
+          <!-- Angka hasil utama (besar & tebal) + simbol satuan tujuan -->
+          <div class="d-flex align-items-baseline flex-wrap mb-1">
+            <span id="resultValue" class="fw-bold text-success me-2" style="font-size: 2.5rem; line-height: 1.2;"></span>
+            <span id="resultUnitSymbol" class="text-secondary" style="font-size: 1.25rem;"></span>
           </div>
-          <div class="text-muted small" id="resultSmartFormat" style="font-style: italic;"></div>
+
+          <!-- Format cerdas (italic) -->
+          <div class="text-muted small fst-italic" id="resultSmartFormat"></div>
         </div>
-        <div class="d-flex gap-2">
+
+        <!-- Sisi kanan: tombol aksi -->
+        <div class="d-flex gap-2 flex-shrink-0">
           <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
             <i class="bi bi-arrow-left-right"></i>
           </button>
@@ -76,6 +86,7 @@
             <i class="bi bi-clipboard"></i>
           </button>
         </div>
+
       </div>
     </div>
   </div>
