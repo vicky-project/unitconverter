@@ -349,11 +349,8 @@ class CallbackHandler extends BaseCallbackHandler
         ];
       }
 
-      // ... dalam handleToSelect, setelah resolve short ID dan menyimpan toId
-
       $state['toId'] = $realId;
-      // Hapus baris $state['waitingInput'] = true; // tidak perlu lagi
-      $this->setState($chatId, $state); // tetap simpan fromId, toId, domain
+      $this->setState($chatId, $state); // tetap simpan domain, fromId, toId
 
       $fromUnit = $this->unitDiscovery->find($fromId);
       $toUnit = $this->unitDiscovery->find($realId);
@@ -364,91 +361,17 @@ class CallbackHandler extends BaseCallbackHandler
       $message = "*Masukkan Nilai*\n";
       $message .= "Konversi: *{$fromLabel}* → *{$toLabel}*\n";
       $message .= "⸻\n";
-      $message .= "Balas pesan ini dengan angka yang ingin dikonversi\\.\n";
+      $message .= "Balas pesan ini dengan angka yang ingin dikonversi.\n";
       $message .= "_Contoh: `42.5`_";
 
-      // Gunakan expectReply untuk force reply
       return $this->expectReply(
         $chatId,
-        $this->buildModuleCallback('input', 'number'), // identifier = unitconverter:input:number
+        'unitconverter:input:number', // identifier handler
         [
           'fromId' => $fromId,
           'toId' => $realId,
         ],
-        $message,
-        null, // messageId (biarkan null agar mengirim pesan baru)
-        null // replyMarkup (default force_reply)
+        $message
       );
-    }
-
-    // ----- handleInput (teks angka) -----
-    public function handleInput(int $chatId, string $text): ?array
-    {
-      $state = $this->getState($chatId);
-
-      if (!($state['waitingInput'] ?? false)) {
-        return null;
-      }
-
-      $fromId = $state['fromId'] ?? null;
-      $toId = $state['toId'] ?? null;
-
-      if (!$fromId || !$toId) {
-        $this->clearState($chatId);
-        return null;
-      }
-
-      $value = str_replace(',', '.', trim($text));
-      if (!is_numeric($value)) {
-        return [
-          'status' => 'invalid_number',
-          'send_message' => [
-            'text' => '⚠️ Masukkan angka yang valid\. Contoh: `42.5`',
-            'parse_mode' => 'MarkdownV2',
-          ],
-        ];
-      }
-
-      $value = (float) $value;
-
-      try {
-        $result = $this->converterService->convert($value, $fromId, $toId);
-
-        $fromUnit = $this->unitDiscovery->find($fromId);
-        $toUnit = $this->unitDiscovery->find($toId);
-
-        $fromLabel = $fromUnit ? $fromUnit['symbol'] : $fromId;
-        $toLabel = $toUnit ? $toUnit['symbol'] : $toId;
-
-        $message = "*✅ Hasil Konversi*\n\n";
-        $message .= "{$value} {$fromLabel} = *{$result['result']} {$toLabel}*\n";
-        $message .= "\n⸻\n";
-        $message .= "Kirim angka lagi untuk konversi baru\\.\n";
-        $message .= "Ketik /convert untuk ganti satuan\\.";
-
-        $state['waitingInput'] = false;
-        $this->setState($chatId, $state);
-
-        return [
-          'status' => 'conversion_done',
-          'send_message' => [
-            'text' => $message,
-            'parse_mode' => 'MarkdownV2',
-          ],
-        ];
-      } catch (\Exception $e) {
-        return [
-          'status' => 'conversion_error',
-          'send_message' => [
-            'text' => '❌ Gagal konversi: ' . $e->getMessage(),
-          ],
-        ];
-      }
-    }
-
-    public function isWaitingInput(int $chatId): bool
-    {
-      $state = $this->getState($chatId);
-      return $state['waitingInput'] ?? false;
     }
   }
