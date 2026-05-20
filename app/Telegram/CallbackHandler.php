@@ -100,12 +100,10 @@ class CallbackHandler extends BaseCallbackHandler
     {
       // Penting: value diisi string kosong, bukan null
       return [
-        [
-          'text' => '« Kembali',
-          'callback_data' => [
-            'action' => 'back',
-            'value' => '0'
-          ],
+        'text' => '« Kembali',
+        'callback_data' => [
+          'action' => 'back',
+          'value' => '0'
         ],
       ];
     }
@@ -155,10 +153,6 @@ class CallbackHandler extends BaseCallbackHandler
       }
 
       $units = $this->unitDiscovery->getUnitsByDomainWithShortIds($id);
-      Log::debug('Callback handler converter', [
-        'units' => $units,
-        'id' => $id
-      ]);
 
       if (empty($units)) {
         return [
@@ -190,6 +184,9 @@ class CallbackHandler extends BaseCallbackHandler
 
       $keyboards = $this->inlineKeyboard->grid($items, 2);
       $keyboards[] = $this->backButton('domain');
+      Log::debug('Callback handler converter', [
+        'keyboards' => $keyboards,
+      ]);
 
       $message = "*Pilih Satuan Sumber*\n";
       $message .= "Domain: *{$id}*\n";
