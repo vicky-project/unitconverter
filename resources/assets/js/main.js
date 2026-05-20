@@ -18,6 +18,7 @@
     const errorMessage = document.getElementById('errorMessage');
     const fromUnitCount = document.getElementById('fromUnitCount');
     const toUnitCount = document.getElementById('toUnitCount');
+    const resultSmartFormat = document.getElementById('resultSmartFormat');
 
     // ----- Helper UI -----
     function showError(msg) {
@@ -29,12 +30,47 @@
     }
     function showResult(data) {
       resultContainer.classList.remove('d-none');
+
+      // Hasil utama (tetap asli dari server)
       resultValue.textContent = data.result;
+
       const toOption = toSelect.options[toSelect.selectedIndex];
-      resultUnitSymbol.textContent = toOption ? toOption.text.split(' – ')[0]: '';
+      const toSymbol = toOption ? toOption.text.split(' – ')[0]: '';
+      resultUnitSymbol.textContent = toSymbol;
+
       const fromOption = fromSelect.options[fromSelect.selectedIndex];
-      resultFromInfo.textContent = `${data.value} ${fromOption ? fromOption.text.split(' – ')[0]: ''} =`;
-      ns.currentResult = data.result;
+      const fromSymbol = fromOption ? fromOption.text.split(' – ')[0]: '';
+      resultFromInfo.textContent = `${data.value} ${fromSymbol} =`;
+
+      // Format cerdas
+      if (resultSmartFormat) {
+        const formatted = smartFormat(data.result);
+        resultSmartFormat.textContent = `≈ ${formatted} ${toSymbol}`;
+      }
+
+      // Simpan untuk salin (teks lengkap)
+      ns.currentResult = `${data.value} ${fromSymbol} = ${data.result} ${toSymbol}`;
+    }
+
+    function smartFormat(value) {
+      const num = parseFloat(value);
+      if (isNaN(num)) return value;
+
+      // Jika nilai sangat kecil atau besar, gunakan notasi ilmiah
+      if (Math.abs(num) < 1e-6 || Math.abs(num) >= 1e15) {
+        return num.toExponential(6);
+      }
+
+      // Jika desimal, batasi 6 digit di belakang koma
+      if (Number.isInteger(num)) {
+        return num.toLocaleString('id-ID');
+      }
+
+      // Format dengan pemisah ribuan dan maks 6 desimal
+      return num.toLocaleString('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 6
+      });
     }
 
     // ----- Load Domains -----

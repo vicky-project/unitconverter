@@ -66,6 +66,7 @@
             <span id="resultValue" class="fs-3 fw-bold text-success me-2"></span>
             <span id="resultUnitSymbol" class="text-secondary fs-6"></span>
           </div>
+          <div class="text-muted small" id="resultSmartFormat" style="font-style: italic;"></div>
         </div>
         <div class="d-flex gap-2">
           <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
