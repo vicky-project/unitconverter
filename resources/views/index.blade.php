@@ -53,11 +53,11 @@
 
   <!-- Hasil Konversi -->
   <div id="resultContainer" class="d-none">
-    <div class="card border-success">
-      <div class="card-body d-flex justify-content-between align-items-start gap-2">
+    <div class="card border-success overflow-hidden">
+      <div class="card-body d-flex justify-content-between align-items-start gap-3">
 
-        <!-- Sisi kiri: informasi hasil -->
-        <div class="flex-grow-1">
+        <!-- Sisi kiri: informasi hasil (bisa menyusut) -->
+        <div class="flex-grow-1" style="min-width: 0;">
           <div class="text-muted small mb-1">
             Hasil Konversi
           </div>
@@ -67,18 +67,20 @@
             <span id="resultFromInfo"></span>
           </div>
 
-          <!-- Angka hasil utama (besar & tebal) + simbol satuan tujuan -->
-          <div class="d-flex align-items-baseline flex-wrap mb-1">
-            <span id="resultValue" class="fw-bold text-success me-2" style="font-size: 2.5rem; line-height: 1.2;"></span>
-            <span id="resultUnitSymbol" class="text-secondary" style="font-size: 1.25rem;"></span>
+          <!-- Angka hasil utama (besar & tebal) + simbol -->
+          <div class="d-flex align-items-baseline flex-wrap mb-1" style="overflow-wrap: anywhere;">
+            <span id="resultValue" class="fw-bold text-success me-2 text-break"
+              style="font-size: 2.5rem; line-height: 1.2; word-break: break-all;"></span>
+            <span id="resultUnitSymbol" class="text-secondary flex-shrink-0"
+              style="font-size: 1.25rem;"></span>
           </div>
 
           <!-- Format cerdas (italic) -->
-          <div class="text-muted small fst-italic" id="resultSmartFormat"></div>
+          <div class="text-muted small fst-italic text-break" id="resultSmartFormat"></div>
         </div>
 
-        <!-- Sisi kanan: tombol aksi -->
-        <div class="d-flex gap-2 flex-shrink-0">
+        <!-- Sisi kanan: tombol aksi (tidak menyusut) -->
+        <div class="d-flex gap-2 flex-shrink-0 align-self-start">
           <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
             <i class="bi bi-arrow-left-right"></i>
           </button>
@@ -86,7 +88,6 @@
             <i class="bi bi-clipboard"></i>
           </button>
         </div>
-
       </div>
     </div>
   </div>
