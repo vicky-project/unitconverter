@@ -109,7 +109,6 @@
   eruda.init();
 </script>
 <script>
-  // Pastikan namespace global
   window.UnitConverter = window.UnitConverter || {};
   window.UnitConverter.BASE_URL = '{{ rtrim(config("app.url"), "/") }}';
 
