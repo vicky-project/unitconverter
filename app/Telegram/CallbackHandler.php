@@ -139,10 +139,6 @@ class CallbackHandler extends BaseCallbackHandler
     // ----- handleDomainSelect -----
     private function handleDomainSelect(string $action, string $id, int $chatId, ?int $messageId): array
     {
-      Log::debug('Callback handler converter', [
-        'action' => $action,
-        'id' => $id
-      ]);
 
       if ($action === 'back') {
         $this->clearState($chatId);
@@ -159,6 +155,10 @@ class CallbackHandler extends BaseCallbackHandler
       }
 
       $units = $this->unitDiscovery->getUnitsByDomainWithShortIds($id);
+      Log::debug('Callback handler converter', [
+        'units' => $units,
+        'id' => $id
+      ]);
 
       if (empty($units)) {
         return [
