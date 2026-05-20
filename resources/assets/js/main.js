@@ -50,6 +50,26 @@
 
       // Simpan untuk salin (teks lengkap)
       ns.currentResult = `${data.value} ${fromSymbol} = ${data.result} ${toSymbol}`;
+      ns.lastConversionData = {
+        value: data.value,
+        from: fromOption?.value,
+        to: toOption?.value,
+        fromSymbol,
+        toSymbol,
+        result: data.result
+      };
+
+      const saveBtnContainer = document.getElementById('saveToNotesContainer');
+      if (saveBtnContainer) {
+        if (window.NotesConfig?.notesAvailable) {
+          saveBtnContainer.innerHTML = `
+          <button id="saveToNotesBtn" class="btn btn-outline-warning btn-sm">
+          <i class="bi bi-journal-plus"></i>
+          </button>`;
+        } else {
+          saveBtnContainer.innerHTML = '';
+        }
+      }
     }
 
     function smartFormat(value) {
@@ -169,12 +189,6 @@
       convertBtn.disabled = false;
     }
 
-    domainSelect.addEventListener('change', validateForm);
-    fromSelect.addEventListener('change', validateForm);
-    toSelect.addEventListener('change', validateForm);
-    valueInput.addEventListener('input', validateForm);
-    convertBtn.disabled = true; // state awal
-
     // ----- Konversi -----
     async function doConversion() {
       const value = parseFloat(valueInput.value);
@@ -213,6 +227,11 @@
       }
     }
 
+    domainSelect.addEventListener('change', validateForm);
+    fromSelect.addEventListener('change', validateForm);
+    toSelect.addEventListener('change', validateForm);
+    valueInput.addEventListener('input', validateForm);
+    convertBtn.disabled = true; // state awal
     convertBtn.addEventListener('click', doConversion);
     valueInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
@@ -275,4 +294,56 @@
     // ----- Inisialisasi -----
     loadDomains();
   });
+
+  // Event delegation untuk tombol Simpan ke Notes
+  document.body.addEventListener('click',
+    async (e) => {
+      if (e.target.id === 'saveToNotesBtn' || e.target.closest('#saveToNotesBtn')) {
+        e.preventDefault();
+        const data = ns.lastConversionData;
+        if (!data) return;
+
+        const payload = {
+          title: `Konversi: ${data.value} ${data.fromSymbol} = ${data.result} ${data.toSymbol}`,
+          content: `<p><strong>${data.value} ${data.fromSymbol}</strong> = <strong>${data.result} ${data.toSymbol}</strong></p>
+          <p><small>Domain: ${domainSelect.options[domainSelect.selectedIndex]?.text || ''}</small></p>`,
+          type: 'text',
+          tags: ['konversi',
+            'unitconverter',
+            data.fromSymbol,
+            data.toSymbol],
+          source_module: 'UnitConverter',
+          source_id: `${data.from}-${data.to}-${Date.now()}`,
+          metadata: {
+            from_unit: data.from,
+            to_unit: data.to,
+            value: data.value,
+            result: data.result,
+            domain: domainSelect.value
+          }
+        };
+
+        const btn = document.getElementById('saveToNotesBtn');
+        const origHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menyimpan...';
+
+        try {
+          await ns.fetchWithAuth(window.NotesConfig.notesEndpoint, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          tgApp.showToast('✅ Berhasil disimpan ke Notes!', 'success');
+          btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Tersimpan';
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = origHTML;
+          }, 2000);
+        } catch (err) {
+          tgApp.showToast('❌ Gagal menyimpan: ' + err.message, 'danger');
+          btn.disabled = false;
+          btn.innerHTML = origHTML;
+        }
+      }
+    });
 })(window.UnitConverter);

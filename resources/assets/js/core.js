@@ -4,6 +4,7 @@
   ns.unitsByDomain = {}; // { 'Area': [ {id, name, symbol}, ... ], 'Length': [...] }
   ns.unitsData = null; // cache daftar satuan per domain
   ns.domains = []; // daftar domain
+  ns.lastConversionData = null;
 
   // Fetch dengan token Sanctum (mengandalkan tgApp.fetchWithAuth dari layout)
   ns.fetchWithAuth = async function(url, options = {}) {
