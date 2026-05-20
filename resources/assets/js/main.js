@@ -64,7 +64,7 @@
         if (window.NotesConfig?.notesAvailable) {
           saveBtnContainer.innerHTML = `
           <button id="saveToNotesBtn" class="btn btn-outline-warning btn-sm">
-          <i class="bi bi-journal-plus me-1"></i> Simpan ke Notes
+          <i class="bi bi-journal-plus"></i>
           </button>`;
         } else {
           saveBtnContainer.innerHTML = '';
