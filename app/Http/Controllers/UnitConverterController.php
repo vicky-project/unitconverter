@@ -2,15 +2,20 @@
 
 namespace Modules\UnitConverter\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Nwidart\Modules\Facades\Module;
 
 class UnitConverterController extends Controller
 {
-  /**
-  * Display a listing of the resource.
-  */
   public function index() {
-    return view('unitconverter::index');
+    $notesAvailable = Module::has('Notes') && Module::isEnabled('Notes');
+    $notesEndpoint = $notesAvailable ? config('app.url') . '/api/integration/note' : null;
+
+    return view('unitconverter::index', [
+      'notesConfig' => [
+        'notesAvailable' => $notesAvailable,
+        'notesEndpoint' => $notesEndpoint,
+      ],
+    ]);
   }
 }

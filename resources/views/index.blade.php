@@ -79,7 +79,7 @@
           <div class="text-muted small fst-italic text-break" id="resultSmartFormat"></div>
         </div>
 
-        <!-- Sisi kanan: tombol aksi (tidak menyusut) -->
+        <!-- Sisi kanan: tombol aksi -->
         <div class="d-flex gap-2 flex-shrink-0 align-self-start">
           <button class="btn btn-outline-secondary btn-sm" id="reverseBtn" title="Balik konversi">
             <i class="bi bi-arrow-left-right"></i>
@@ -87,6 +87,7 @@
           <button class="btn btn-outline-secondary btn-sm" id="copyResultBtn" title="Salin hasil">
             <i class="bi bi-clipboard"></i>
           </button>
+          <div id="saveToNotesContainer"></div>
         </div>
       </div>
     </div>
@@ -104,6 +105,9 @@
 @endsection
 
 @push('scripts')
+<script>
+  window.NotesConfig = @json($notesConfig);
+</script>
 <script>
   window.UnitConverter = window.UnitConverter || {};
   window.UnitConverter.BASE_URL = '{{ rtrim(config("app.url"), "/") }}';
