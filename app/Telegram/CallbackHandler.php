@@ -100,11 +100,13 @@ class CallbackHandler extends BaseCallbackHandler
     {
       // Penting: value diisi string kosong, bukan null
       return [
-        'text' => '« Kembali',
-        'callback_data' => [
-          'action' => 'back',
-          'value' => '0'
-        ],
+        [
+          'text' => '« Kembali',
+          'callback_data' => [
+            'action' => 'back',
+            'value' => '0'
+          ],
+        ]
       ];
     }
 
