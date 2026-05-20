@@ -14,6 +14,9 @@
     const reverseBtn = document.getElementById('reverseBtn');
     const errorContainer = document.getElementById('errorContainer');
     const errorMessage = document.getElementById('errorMessage');
+    const resetBtn = document.getElementById('resetBtn');
+    const fromUnitCount = document.getElementById('fromUnitCount');
+    const toUnitCount = document.getElementById('toUnitCount');
 
     function showError(msg) {
       errorContainer.classList.remove('d-none');
@@ -32,6 +35,23 @@
       const fromOption = fromSelect.options[fromSelect.selectedIndex];
       resultFromInfo.textContent = `${data.value} ${fromOption ? fromOption.text.split(' – ')[0]: ''} =`;
       ns.currentResult = data.result;
+    }
+
+    // Fungsi reset
+    function resetForm() {
+      domainSelect.value = '';
+      localStorage.removeItem('unit_last_domain');
+      fromSelect.innerHTML = '<option value="">Pilih satuan</option>';
+      toSelect.innerHTML = '<option value="">Pilih satuan</option>';
+      fromSelect.disabled = true;
+      toSelect.disabled = true;
+      fromUnitCount.textContent = '';
+      toUnitCount.textContent = '';
+      valueInput.value = '';
+      hideError();
+      resultContainer.classList.add('d-none');
+      // Hapus focus dari input
+      valueInput.blur();
     }
 
     async function loadDomains() {
@@ -55,9 +75,10 @@
       }
     }
 
-    async function loadUnitsForDomain(domain, targetSelect) {
+    async function loadUnitsForDomain(domain, targetSelect, countSpan) {
       targetSelect.innerHTML = '<option value="">Memuat...</option>';
       targetSelect.disabled = true;
+      if (countSpan) countSpan.textContent = '';
       if (!domain) {
         targetSelect.innerHTML = '<option value="">Pilih satuan</option>';
         return;
@@ -73,6 +94,7 @@
           targetSelect.appendChild(option);
         });
         targetSelect.disabled = false;
+        if (countSpan) countSpan.textContent = `(${units.lengtg})`;
       } catch (err) {
         tgApp.showToast('Gagal memuat satuan', 'danger');
       }
@@ -88,8 +110,8 @@
       hideError();
       resultContainer.classList.add('d-none');
       if (domain) {
-        loadUnitsForDomain(domain, fromSelect);
-        loadUnitsForDomain(domain, toSelect);
+        loadUnitsForDomain(domain, fromSelect, fromUnitCount);
+        loadUnitsForDomain(domain, toSelect, toUnitCount);
       }
     });
 
@@ -164,6 +186,9 @@
           tgApp.copyToClipboard(ns.currentResult);
         }
       });
+
+    resetBtn.addEventListener('click',
+      resetForm);
 
     loadDomains();
   });

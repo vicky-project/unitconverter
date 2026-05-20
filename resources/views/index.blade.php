@@ -6,9 +6,14 @@
 <div class="container py-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Konversi Satuan</h5>
-    <button class="btn btn-outline-secondary btn-sm" id="swapUnitsBtn" title="Tukar satuan">
-      <i class="bi bi-arrow-repeat"></i>
-    </button>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" id="resetBtn" title="Reset">
+        <i class="bi bi-x-circle"></i>
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" id="swapUnitsBtn" title="Tukar satuan">
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
   </div>
 
   <!-- Card: Input Nilai & Pilih Satuan -->
@@ -28,13 +33,13 @@
       </div>
       <div class="row mb-3">
         <div class="col-6">
-          <label for="fromUnit" class="form-label fw-semibold">Dari Satuan</label>
+          <label for="fromUnit" class="form-label fw-semibold">Dari Satuan <span id="fromUnitCount" class="text-muted small"></span></label>
           <select id="fromUnit" class="form-select form-select-lg" disabled>
             <option value="">Pilih satuan</option>
           </select>
         </div>
         <div class="col-6">
-          <label for="toUnit" class="form-label fw-semibold">Ke Satuan</label>
+          <label for="toUnit" class="form-label fw-semibold">Ke Satuan <span id="toUnitCount" class="text-muted small"></span></label>
           <select id="toUnit" class="form-select form-select-lg" disabled>
             <option value="">Pilih satuan</option>
           </select>
@@ -138,6 +143,10 @@
     background-color: rgba(220,53,69,0.1);
     border-color: rgba(220,53,69,0.3);
     color: var(--tg-theme-text-color);
+    }
+    #fromUnitCount, #toUnitCount {
+    font-weight: normal;
+    margin-left: 2px;
     }
     </style>
     @endpush
