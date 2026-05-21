@@ -55,6 +55,10 @@ class UnitConverterServiceProvider extends ServiceProvider
       __DIR__ . '/../app/Custom/Torque',
       'Modules\\UnitConverter\\Custom\\Torque'
     );
+    UnitMap::add(
+      __DIR__ . '/../app/Custom/FlowRate',
+      'Modules\\UnitConverter\\Custom\\FlowRate'
+    );
 
     if ($this->app->bound(Services\Handlers\CommandDispatcher::class)) {
       $dispatcher = $this->app->make(Services\Handlers\CommandDispatcher::class);
